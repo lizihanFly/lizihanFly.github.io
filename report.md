@@ -9,11 +9,13 @@ This assignment was completed in an Ubuntu virtual machine environment. I used L
 
 The commands used were:
 
-    lscpu
-    free -h
-    uname -a
-    gcc --version
-    python3 --version
+~~~bash
+lscpu
+free -h
+uname -a
+gcc --version
+python3 --version
+~~~
 
 The collected system information is shown in Appendix A.
 
@@ -25,7 +27,9 @@ For two matrices A and B, the element in row i and column j of the result matrix
 
 The formula is:
 
-    C[i][j] = A[i][0] * B[0][j] + A[i][1] * B[1][j] + ... + A[i][k] * B[k][j]
+~~~text
+C[i][j] = A[i][0] * B[0][j] + A[i][1] * B[1][j] + ... + A[i][k] * B[k][j]
+~~~
 
 The program uses three nested loops:
 
@@ -39,7 +43,9 @@ The source code file is named `matmul.py`.
 
 The program can be executed with the following command:
 
-    python3 matmul.py
+~~~bash
+python3 matmul.py
+~~~
 
 The program contains three main parts:
 
@@ -51,23 +57,29 @@ The program contains three main parts:
 
 To verify the correctness of the algorithm, I used a small example that can be checked manually.
 
-    A = [[1, 2],
-         [3, 4]]
+~~~text
+A = [[1, 2],
+     [3, 4]]
 
-    B = [[5, 6],
-         [7, 8]]
+B = [[5, 6],
+     [7, 8]]
+~~~
 
 According to the rule of matrix multiplication:
 
-    C[0][0] = 1*5 + 2*7 = 19
-    C[0][1] = 1*6 + 2*8 = 22
-    C[1][0] = 3*5 + 4*7 = 43
-    C[1][1] = 3*6 + 4*8 = 50
+~~~text
+C[0][0] = 1*5 + 2*7 = 19
+C[0][1] = 1*6 + 2*8 = 22
+C[1][0] = 3*5 + 4*7 = 43
+C[1][1] = 3*6 + 4*8 = 50
+~~~
 
 Therefore, the expected result is:
 
-    [[19, 22],
-     [43, 50]]
+~~~text
+[[19, 22],
+ [43, 50]]
+~~~
 
 The program output matches the expected result, so the implementation is correct.
 
@@ -90,6 +102,7 @@ I also implemented matrix multiplication in Python and verified the correctness 
 
 ## Appendix A. System Information
 
+~~~text
 ===== CPU Information =====
 Architecture:                            x86_64
 CPU op-mode(s):                          32-bit, 64-bit
@@ -153,9 +166,11 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ===== Python Version =====
 Python 3.12.3
 
+~~~
 
 ## Appendix B. Python Running Output
 
+~~~text
 ===== Correctness Verification =====
 A =
 [1, 2]
@@ -176,92 +191,95 @@ Verification result: correct
 100 x 100 matrix multiplication time: 0.077458 seconds
 150 x 150 matrix multiplication time: 0.264163 seconds
 
+~~~
 
 ## Appendix C. Python Source Code
 
-    import time
-    import random
-    
-    
-    def matmul(A, B):
-        """
-        Implement matrix multiplication C = A x B using three nested loops.
-        A is an n x m matrix, B is an m x p matrix, and C is an n x p matrix.
-        """
-        n = len(A)
-        m = len(A[0])
-        p = len(B[0])
-    
-        C = [[0 for _ in range(p)] for _ in range(n)]
-    
-        for i in range(n):
-            for j in range(p):
-                total = 0
-                for k in range(m):
-                    total += A[i][k] * B[k][j]
-                C[i][j] = total
-    
-        return C
-    
-    
-    def print_matrix(M):
-        for row in M:
-            print(row)
-    
-    
-    def verify():
-        A = [
-            [1, 2],
-            [3, 4]
-        ]
-    
-        B = [
-            [5, 6],
-            [7, 8]
-        ]
-    
-        expected = [
-            [19, 22],
-            [43, 50]
-        ]
-    
-        result = matmul(A, B)
-    
-        print("A =")
-        print_matrix(A)
-    
-        print("B =")
-        print_matrix(B)
-    
-        print("Python result C = A x B:")
-        print_matrix(result)
-    
-        print("Expected result:")
-        print_matrix(expected)
-    
-        if result == expected:
-            print("Verification result: correct")
-        else:
-            print("Verification result: incorrect")
-    
-    
-    def performance_test(size):
-        A = [[random.randint(0, 9) for _ in range(size)] for _ in range(size)]
-        B = [[random.randint(0, 9) for _ in range(size)] for _ in range(size)]
-    
-        start = time.time()
-        matmul(A, B)
-        end = time.time()
-    
-        return end - start
-    
-    
-    if __name__ == "__main__":
-        print("===== Correctness Verification =====")
-        verify()
-    
-        print("\n===== Python Execution Time Test =====")
-        for size in [50, 100, 150]:
-            t = performance_test(size)
-            print(f"{size} x {size} matrix multiplication time: {t:.6f} seconds")
-    
+~~~python
+import time
+import random
+
+
+def matmul(A, B):
+    """
+    Implement matrix multiplication C = A x B using three nested loops.
+    A is an n x m matrix, B is an m x p matrix, and C is an n x p matrix.
+    """
+    n = len(A)
+    m = len(A[0])
+    p = len(B[0])
+
+    C = [[0 for _ in range(p)] for _ in range(n)]
+
+    for i in range(n):
+        for j in range(p):
+            total = 0
+            for k in range(m):
+                total += A[i][k] * B[k][j]
+            C[i][j] = total
+
+    return C
+
+
+def print_matrix(M):
+    for row in M:
+        print(row)
+
+
+def verify():
+    A = [
+        [1, 2],
+        [3, 4]
+    ]
+
+    B = [
+        [5, 6],
+        [7, 8]
+    ]
+
+    expected = [
+        [19, 22],
+        [43, 50]
+    ]
+
+    result = matmul(A, B)
+
+    print("A =")
+    print_matrix(A)
+
+    print("B =")
+    print_matrix(B)
+
+    print("Python result C = A x B:")
+    print_matrix(result)
+
+    print("Expected result:")
+    print_matrix(expected)
+
+    if result == expected:
+        print("Verification result: correct")
+    else:
+        print("Verification result: incorrect")
+
+
+def performance_test(size):
+    A = [[random.randint(0, 9) for _ in range(size)] for _ in range(size)]
+    B = [[random.randint(0, 9) for _ in range(size)] for _ in range(size)]
+
+    start = time.time()
+    matmul(A, B)
+    end = time.time()
+
+    return end - start
+
+
+if __name__ == "__main__":
+    print("===== Correctness Verification =====")
+    verify()
+
+    print("\n===== Python Execution Time Test =====")
+    for size in [50, 100, 150]:
+        t = performance_test(size)
+        print(f"{size} x {size} matrix multiplication time: {t:.6f} seconds")
+
+~~~
