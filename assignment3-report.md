@@ -1,9 +1,13 @@
 # Assignment 3 Report: Deployment and Integration of AI Agents
 
-**Student:** Lizihan  
-**Project:** FileLens Agent Lab  
-**Live demo:** <https://lizihanfly.github.io/agent-lab.html>  
-**Source repository:** <https://github.com/lizihanFly/lizihanFly.github.io>  
+**Student:** Lizihan
+
+**Project:** FileLens Agent Lab
+
+**Live demo:** <https://lizihanfly.github.io/agent-lab.html>
+
+**Source repository:** <https://github.com/lizihanFly/lizihanFly.github.io>
+
 **Date:** June 10, 2026
 
 ## 1. Objective

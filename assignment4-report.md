@@ -1,9 +1,13 @@
 # Assignment 4 Report: Developing an AI-Assisted Application
 
-**Student:** Lizihan  
-**Project option:** Option A, "Defend Your Thesis"  
-**Application:** <https://lizihanfly.github.io/thesis-defense.html>  
-**Source repository:** <https://github.com/lizihanFly/lizihanFly.github.io>  
+**Student:** Lizihan
+
+**Project option:** Option A, "Defend Your Thesis"
+
+**Application:** <https://lizihanfly.github.io/thesis-defense.html>
+
+**Source repository:** <https://github.com/lizihanFly/lizihanFly.github.io>
+
 **Date:** June 10, 2026
 
 ## 1. Project Summary
