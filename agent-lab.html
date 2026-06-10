@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="An interactive file-analysis agent supporting browser demo, online LLM, and local Ollama modes.">
+    <title>Agent Lab | Lizihan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="agent-lab.css">
+    <script src="site.js" defer></script>
+    <script src="agent-lab.js" defer></script>
+</head>
+<body>
+    <div class="page-glow page-glow-one" aria-hidden="true"></div>
+    <header class="site-header">
+        <a class="brand" href="index.html"><span class="brand-mark">LZ</span><span>Lizihan Lab</span></a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+            <span></span><span></span><span></span><span class="sr-only">Toggle navigation</span>
+        </button>
+        <nav id="site-nav" class="site-nav" aria-label="Main navigation">
+            <a href="index.html">Home</a>
+            <a class="active" href="agent-lab.html">Agent Lab</a>
+            <a href="thesis-defense.html">Thesis Defense</a>
+            <a href="assignment3-report.html">Report</a>
+        </nav>
+    </header>
+
+    <main class="inner-main">
+        <section class="inner-hero shell" data-reveal>
+            <div>
+                <p class="breadcrumb"><a href="index.html">Home</a> / Assignment 3</p>
+                <p class="eyebrow">Deployment & Integration of AI Agents</p>
+                <h1>One task. <span>Three agent modes.</span></h1>
+                <p>Give the agent a text, code, CSV, JSON, or Markdown file. Compare a transparent browser tool with an online LLM and a private model running through Ollama.</p>
+            </div>
+            <a class="button button-secondary" href="assignment3-report.html">View full report</a>
+        </section>
+
+        <section class="agent-shell shell" data-reveal>
+            <aside class="agent-sidebar">
+                <div class="sidebar-title">
+                    <div>
+                        <span class="agent-logo">AI</span>
+                        <div><strong>FileLens Agent</strong><small>Assignment 3 demo</small></div>
+                    </div>
+                    <span id="agent-status" class="chip status-pill ready">Ready</span>
+                </div>
+
+                <div class="mode-picker" role="radiogroup" aria-label="Agent mode">
+                    <label class="mode-option active">
+                        <input type="radio" name="provider" value="demo" checked>
+                        <span class="mode-icon">01</span>
+                        <span><strong>Browser demo</strong><small>No key · deterministic</small></span>
+                        <i></i>
+                    </label>
+                    <label class="mode-option">
+                        <input type="radio" name="provider" value="online">
+                        <span class="mode-icon purple">02</span>
+                        <span><strong>Online LLM</strong><small>OpenAI-compatible API</small></span>
+                        <i></i>
+                    </label>
+                    <label class="mode-option">
+                        <input type="radio" name="provider" value="ollama">
+                        <span class="mode-icon teal">03</span>
+                        <span><strong>Local Ollama</strong><small>Private · localhost</small></span>
+                        <i></i>
+                    </label>
+                </div>
+
+                <div class="settings-panel" data-settings="demo">
+                    <h3>Browser tool</h3>
+                    <p>Runs a small, explainable analysis pipeline directly in JavaScript. It is always available and sends no data anywhere.</p>
+                    <ul class="check-list">
+                        <li>Document statistics</li>
+                        <li>Keyword extraction</li>
+                        <li>Code and data inspection</li>
+                    </ul>
+                </div>
+
+                <div class="settings-panel hidden" data-settings="online">
+                    <h3>Online connection</h3>
+                    <div class="field">
+                        <label for="online-endpoint">API endpoint</label>
+                        <input id="online-endpoint" type="url" value="https://api.deepseek.com/chat/completions" spellcheck="false">
+                    </div>
+                    <div class="field">
+                        <label for="online-model">Model</label>
+                        <input id="online-model" value="deepseek-chat" spellcheck="false">
+                    </div>
+                    <div class="field">
+                        <label for="online-key">API key</label>
+                        <input id="online-key" type="password" placeholder="Stored in memory only" autocomplete="off">
+                    </div>
+                    <button class="mini-button" type="button" data-test="online">Test connection</button>
+                    <p class="privacy-note">Never commit keys to GitHub. Some providers block direct browser requests with CORS.</p>
+                </div>
+
+                <div class="settings-panel hidden" data-settings="ollama">
+                    <h3>Ollama connection</h3>
+                    <div class="field">
+                        <label for="ollama-endpoint">Local endpoint</label>
+                        <input id="ollama-endpoint" type="url" value="http://localhost:11434/api/chat" spellcheck="false">
+                    </div>
+                    <div class="field">
+                        <label for="ollama-model">Local model</label>
+                        <input id="ollama-model" value="qwen2.5:3b" spellcheck="false">
+                    </div>
+                    <button class="mini-button" type="button" data-test="ollama">Test connection</button>
+                    <p class="privacy-note">Start Ollama first. For this hosted page, allow the site origin with <code>OLLAMA_ORIGINS</code>.</p>
+                </div>
+
+                <a class="sidebar-report-link" href="assignment3-report.html">
+                    <span>Read setup & reflection</span><b>→</b>
+                </a>
+            </aside>
+
+            <div class="agent-workspace">
+                <div class="workspace-toolbar">
+                    <div>
+                        <span class="toolbar-dot"></span>
+                        <strong>Analysis workspace</strong>
+                    </div>
+                    <button id="clear-session" class="text-button" type="button">Clear session</button>
+                </div>
+
+                <div class="workspace-grid">
+                    <section class="file-column">
+                        <div id="drop-zone" class="drop-zone" tabindex="0" role="button" aria-label="Upload a file">
+                            <input id="file-input" type="file" accept=".txt,.md,.csv,.json,.py,.js,.html,.css,.xml,.log" hidden>
+                            <div class="upload-icon" aria-hidden="true">↑</div>
+                            <h2>Drop a file here</h2>
+                            <p>or click to browse · maximum 2 MB</p>
+                            <span>TXT · MD · CSV · JSON · CODE</span>
+                        </div>
+
+                        <div class="sample-row">
+                            <span>Try a sample:</span>
+                            <button type="button" data-sample="research">Research notes</button>
+                            <button type="button" data-sample="code">Python code</button>
+                            <button type="button" data-sample="csv">Experiment CSV</button>
+                        </div>
+
+                        <div id="file-card" class="file-card hidden">
+                            <div class="file-badge" id="file-badge">TXT</div>
+                            <div><strong id="file-name">sample.txt</strong><small id="file-meta">0 KB · 0 lines</small></div>
+                            <button id="remove-file" type="button" aria-label="Remove file">×</button>
+                        </div>
+
+                        <div class="preview-card">
+                            <div class="preview-head"><span>File preview</span><span id="preview-count">No file</span></div>
+                            <pre id="file-preview">Select a sample or upload a file to begin.</pre>
+                        </div>
+                    </section>
+
+                    <section class="chat-column">
+                        <div id="conversation" class="conversation" aria-live="polite">
+                            <div class="message agent-message">
+                                <span class="message-avatar">AI</span>
+                                <div>
+                                    <p class="message-meta">FileLens Agent · now</p>
+                                    <div class="message-body">
+                                        <p>Hello. Add a file, then ask a specific question. I can summarize it, inspect structure, find risks, or explain code.</p>
+                                        <div class="suggestion-chips">
+                                            <button type="button">Summarize the key findings</button>
+                                            <button type="button">Find risks and action items</button>
+                                            <button type="button">Explain the file structure</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form id="agent-form" class="prompt-box">
+                            <label class="sr-only" for="question">Ask a question about the file</label>
+                            <textarea id="question" rows="3" placeholder="Ask a question about your file..." required></textarea>
+                            <div class="prompt-footer">
+                                <span id="mode-label"><b>Mode:</b> Browser demo</span>
+                                <button id="run-agent" class="send-button" type="submit">Analyze <span>↗</span></button>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </section>
+
+        <section class="evidence-section shell">
+            <div class="section-heading" data-reveal>
+                <div><p class="eyebrow">Assignment coverage</p><h2>What this demo proves.</h2></div>
+                <p>The interface is the shared front end; only the model adapter changes. This makes results easier to compare fairly.</p>
+            </div>
+            <div class="evidence-grid">
+                <article data-reveal><span>5 pts</span><h3>Online Agent</h3><p>Configurable OpenAI-compatible endpoint, model, key, file context, and a focused question.</p></article>
+                <article data-reveal><span>4 pts</span><h3>Local Deployment</h3><p>Direct Ollama chat integration with a localhost endpoint and selectable local model.</p></article>
+                <article data-reveal><span>3 pts</span><h3>IDE Integration</h3><p>The report documents planning, code generation, refactoring, review, and debugging with an AI coding agent.</p></article>
+                <article data-reveal><span>3 pts</span><h3>Documentation</h3><p>Setup instructions, architecture, challenges, limitations, and an online-versus-local reflection.</p></article>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer shell">
+        <a class="brand" href="index.html"><span class="brand-mark">LZ</span><span>Lizihan Lab</span></a>
+        <p>Assignment 3 · AI Agent Deployment</p>
+        <p>© <span data-year>2026</span> Lizihan</p>
+    </footer>
+</body>
+</html>

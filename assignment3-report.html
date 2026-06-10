@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Assignment 3 Report | Lizihan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="site.js" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="index.html"><span class="brand-mark">LZ</span><span>Lizihan Lab</span></a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><span class="sr-only">Toggle navigation</span></button>
+        <nav id="site-nav" class="site-nav"><a href="index.html">Home</a><a href="agent-lab.html">Agent Lab</a><a class="active" href="assignment3-report.html">Report</a><a href="assignment3-report.md">Markdown</a></nav>
+    </header>
+    <main class="inner-main shell">
+        <div class="doc-layout">
+            <article class="panel doc-article">
+                <p class="eyebrow">Assignment 3 · June 10, 2026</p>
+                <h1>Deployment and Integration of AI Agents</h1>
+                <p><strong>Student:</strong> Lizihan<br><strong>Project:</strong> FileLens Agent Lab<br><strong>Live demo:</strong> <a href="agent-lab.html">Open the interactive application</a></p>
+
+                <h2 id="objective">1. Objective</h2>
+                <p>This assignment compares one file-analysis task across a deterministic browser agent, an online OpenAI-compatible model, and a local model served by Ollama. The same interface, file, and question are used in each mode, making privacy, setup, speed, and output easier to compare.</p>
+
+                <h2 id="mapping">2. Rubric Mapping</h2>
+                <table>
+                    <thead><tr><th>Requirement</th><th>Implementation</th><th>Evidence</th></tr></thead>
+                    <tbody>
+                        <tr><td>Online Agent (5 pts)</td><td>Configurable endpoint, model, key, file, and question</td><td><code>queryOnline()</code></td></tr>
+                        <tr><td>Local Model (4 pts)</td><td>Ollama chat adapter and connection test</td><td><code>queryOllama()</code></td></tr>
+                        <tr><td>IDE Integration (3 pts)</td><td>AI-assisted architecture, coding, refactoring, and review</td><td>Development log</td></tr>
+                        <tr><td>Documentation (3 pts)</td><td>Setup, challenges, tests, and reflection</td><td>This report</td></tr>
+                    </tbody>
+                </table>
+
+                <h2 id="architecture">3. Architecture</h2>
+                <pre>User file + question
+        |
+Input validation
+        |
+Provider adapter
+  |         |          |
+Browser   Online     Ollama
+rules     LLM API    localhost
+  |         |          |
+  +---------+----------+
+            |
+      Conversation UI</pre>
+                <p>The provider-adapter pattern keeps the interface independent of a specific model. The uploaded file is read with <code>FileReader</code>, limited to 2 MB, and truncated before a network request to prevent oversized prompts.</p>
+
+                <h2 id="online">4. Online Agent</h2>
+                <p>The online mode works with an OpenAI-compatible chat-completions endpoint. The default example uses <code>https://api.deepseek.com/chat/completions</code> and <code>deepseek-chat</code>. The user enters a key, tests the connection, adds a file, and asks a focused question.</p>
+                <div class="notice"><strong>Security decision:</strong> the API key remains in page memory only. It is never saved to local storage, cookies, source files, or Git.</div>
+                <p>A production public service should place permanent credentials behind a server-side proxy. Some model providers also block direct browser requests through CORS policy.</p>
+
+                <h2 id="ollama">5. Local Ollama Deployment</h2>
+                <p>The local mode calls Ollama's <code>/api/chat</code> endpoint. Ollama was not installed on the development computer when checked on June 10, 2026, so this report does not invent a successful local run.</p>
+                <pre>ollama pull qwen2.5:3b
+ollama run qwen2.5:3b
+
+$env:OLLAMA_ORIGINS="https://lizihanfly.github.io"
+ollama serve</pre>
+                <p>After starting Ollama, select Local Ollama, confirm the endpoint and downloaded model name, then use the connection test. In this mode file content remains on the user's computer.</p>
+
+                <h2 id="ide">6. IDE Integration</h2>
+                <p>An AI coding agent inspected the existing GitHub Pages repository, helped translate the rubric into features, proposed the provider-adapter architecture, implemented drag-and-drop input and error states, and reviewed the result. Human decisions preserved the static architecture, prohibited committed secrets, and required honest documentation of unverified external services.</p>
+                <p>Provider-specific code was separated into <code>queryOnline()</code> and <code>queryOllama()</code>, while <code>buildMessages()</code> creates the shared grounded prompt. This reduced duplication and made the modes easier to test.</p>
+
+                <h2 id="browser">7. Browser Baseline</h2>
+                <p>The no-key mode is clearly labeled as a rule-based tool, not an LLM. It provides document statistics, keyword extraction, risk and TODO detection, code structure inspection, CSV profiling, and question-to-sentence ranking. This creates a reliable baseline and keeps the live demonstration usable without credentials.</p>
+
+                <h2 id="tests">8. Testing</h2>
+                <table>
+                    <thead><tr><th>Test</th><th>Expected result</th></tr></thead>
+                    <tbody>
+                        <tr><td>Submit without file</td><td>Agent asks for a file</td></tr>
+                        <tr><td>File over 2 MB</td><td>Clear rejection message</td></tr>
+                        <tr><td>Markdown risk query</td><td>Limitations and TODOs returned</td></tr>
+                        <tr><td>Python structure query</td><td>Imports and definitions listed</td></tr>
+                        <tr><td>CSV profile query</td><td>Rows, columns, min, max, and mean returned</td></tr>
+                        <tr><td>Invalid online key</td><td>Error shown in conversation</td></tr>
+                        <tr><td>Ollama offline</td><td>Connection test reports failure</td></tr>
+                    </tbody>
+                </table>
+
+                <h2 id="reflection">9. Reflection</h2>
+                <table>
+                    <thead><tr><th>Factor</th><th>Online model</th><th>Local model</th></tr></thead>
+                    <tbody>
+                        <tr><td>Setup</td><td>API account and key</td><td>Install Ollama and download model</td></tr>
+                        <tr><td>Quality</td><td>Often stronger reasoning</td><td>Depends on model and hardware</td></tr>
+                        <tr><td>Privacy</td><td>Content leaves computer</td><td>Content remains local</td></tr>
+                        <tr><td>Cost</td><td>Possible per-token fee</td><td>No per-request fee</td></tr>
+                        <tr><td>Availability</td><td>Requires network/provider</td><td>Works offline after download</td></tr>
+                    </tbody>
+                </table>
+                <p>The online model is easiest for strong analysis on modest hardware. Ollama is preferable for private files and offline work. The browser baseline is most predictable and explainable, but cannot match an LLM's semantic reasoning.</p>
+
+                <h2 id="conclusion">10. Conclusion</h2>
+                <p>Agent deployment is more than choosing a model. Secret handling, adapters, validation, error reporting, privacy, and documentation determine whether an agent is useful in a real workflow.</p>
+                <p><a class="button button-primary" href="agent-lab.html">Launch Agent Lab →</a> <a class="button button-secondary" href="assignment3-report.md">View Markdown source</a></p>
+            </article>
+            <aside class="panel doc-nav">
+                <h3>On this page</h3>
+                <a href="#objective">Objective</a><a href="#mapping">Rubric mapping</a><a href="#architecture">Architecture</a><a href="#online">Online Agent</a><a href="#ollama">Local Ollama</a><a href="#ide">IDE Integration</a><a href="#browser">Browser baseline</a><a href="#tests">Testing</a><a href="#reflection">Reflection</a><a href="#conclusion">Conclusion</a>
+            </aside>
+        </div>
+    </main>
+</body>
+</html>

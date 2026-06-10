@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Assignment 4 Report | Lizihan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="site.js" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="index.html"><span class="brand-mark">LZ</span><span>Lizihan Lab</span></a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><span class="sr-only">Toggle navigation</span></button>
+        <nav id="site-nav" class="site-nav"><a href="index.html">Home</a><a href="thesis-defense.html">Play Game</a><a class="active" href="assignment4-report.html">Report</a><a href="assignment4-report.md">Markdown</a></nav>
+    </header>
+    <main class="inner-main shell">
+        <div class="doc-layout">
+            <article class="panel doc-article">
+                <p class="eyebrow">Assignment 4 · Option A · June 10, 2026</p>
+                <h1>Developing an AI-Assisted Application</h1>
+                <p><strong>Student:</strong> Lizihan<br><strong>Project:</strong> Defend Your Thesis<br><strong>Application:</strong> <a href="thesis-defense.html">Play the browser game</a></p>
+
+                <h2 id="summary">1. Project Summary</h2>
+                <p>Defend Your Thesis is a survival-defense game built with HTML, CSS, JavaScript, and the Canvas 2D API. The player protects a thesis core from bugs, deadlines, and Reviewer #2. It runs at a stable GitHub Pages URL with no build step or server.</p>
+
+                <h2 id="requirements">2. Requirement Mapping</h2>
+                <table>
+                    <thead><tr><th>Requirement</th><th>Implementation</th></tr></thead>
+                    <tbody>
+                        <tr><td>Functional software</td><td>Playable browser application</td></tr>
+                        <tr><td>Character selection</td><td>Analyst, Hacker, and Writer with distinct statistics</td></tr>
+                        <tr><td>Game over and score</td><td>Score, wave, result, restart, and persistent best score</td></tr>
+                        <tr><td>Keyboard and mouse</td><td>WASD/arrows, pointer aim, click/space fire, P pause</td></tr>
+                        <tr><td>Mobile access</td><td>Touch direction pad and auto-aim CITE button</td></tr>
+                        <tr><td>AI-assisted development</td><td>Architecture and debugging documented below</td></tr>
+                    </tbody>
+                </table>
+
+                <h2 id="gameplay">3. Gameplay</h2>
+                <p>The player selects a candidate, moves around the arena, fires citations, protects thesis integrity, builds a combo, collects power-ups, and survives progressively harder waves.</p>
+                <table>
+                    <thead><tr><th>Character</th><th>Strength</th><th>Trade-off</th></tr></thead>
+                    <tbody>
+                        <tr><td>Analyst</td><td>Balanced statistics</td><td>No extreme advantage</td></tr>
+                        <tr><td>Hacker</td><td>Fast movement and fire</td><td>Low damage per shot</td></tr>
+                        <tr><td>Writer</td><td>High citation damage</td><td>Slow movement and fire</td></tr>
+                    </tbody>
+                </table>
+
+                <h2 id="architecture">4. Architecture</h2>
+                <pre>Input events
+    |
+Update player -> bullets -> enemies -> collisions
+    |
+Wave manager -> score -> health -> power-ups
+    |
+Render arena -> thesis -> entities -> effects -> HUD</pre>
+                <p>The game uses <code>requestAnimationFrame</code> and delta-time movement. A 0.033-second cap prevents large jumps after a browser tab returns from the background. Data objects define character and enemy balance separately from runtime logic.</p>
+
+                <h2 id="ai">5. AI-Assisted Architecture</h2>
+                <p>An AI coding agent inspected the original static repository and helped convert the assignment brief into modules: character selection, Canvas engine, screen states, multi-input controls, wave management, collision detection, documentation, and tests.</p>
+                <p>A framework-free implementation was selected because the project has one game scene, no server state, and an existing GitHub Pages deployment. This reduced dependencies and kept the source easy to review.</p>
+
+                <h2 id="problems">6. AI-Assisted Problem Solving</h2>
+                <h3>Collision detection</h3>
+                <p>Circle-based collision checks are used for bullets, enemies, the player, power-ups, and the thesis: <code>distance(a, b) &lt; radius(a) + radius(b)</code>.</p>
+                <h3>Input unification</h3>
+                <p>Keyboard and on-screen direction controls write to the same key state. Mouse clicks and the touch fire button use the same firing state. Core game logic therefore does not depend on one physical device.</p>
+                <h3>Browser audio</h3>
+                <p>Web Audio is initialized only after the Begin Defense button is pressed, satisfying browser autoplay rules. Short synthesized tones avoid copyrighted assets and network downloads.</p>
+
+                <h2 id="tests">7. Testing</h2>
+                <table>
+                    <thead><tr><th>Test</th><th>Expected result</th></tr></thead>
+                    <tbody>
+                        <tr><td>Select each character</td><td>Visual selection and runtime statistics change</td></tr>
+                        <tr><td>Move in every direction</td><td>Player stays inside arena</td></tr>
+                        <tr><td>Fire at enemy</td><td>Health decreases and score increases on elimination</td></tr>
+                        <tr><td>Enemy reaches core</td><td>Thesis integrity decreases</td></tr>
+                        <tr><td>Integrity reaches zero</td><td>Game-over result appears</td></tr>
+                        <tr><td>Press P/Escape</td><td>Game pauses and resumes</td></tr>
+                        <tr><td>Clear wave</td><td>Bonus and next wave begin</td></tr>
+                        <tr><td>Collect power-up</td><td>Integrity or fire rate improves</td></tr>
+                        <tr><td>Finish run</td><td>Best score persists in local storage</td></tr>
+                    </tbody>
+                </table>
+
+                <h2 id="challenges">8. Challenges</h2>
+                <p>Character balance is stored as data so it can be tuned without rewriting game logic. Mobile input required an auto-aim option because touch devices cannot comfortably combine movement and precise pointer aiming. Readability is supported through color, shape, labels, health bars, particles, screen shake, and sound.</p>
+
+                <h2 id="limitations">9. Limitations</h2>
+                <ul>
+                    <li>Enemies use direct movement instead of pathfinding.</li>
+                    <li>The game currently contains one arena.</li>
+                    <li>Difficulty needs broader user playtesting.</li>
+                    <li>Best scores remain local to one browser.</li>
+                </ul>
+
+                <h2 id="reflection">10. Reflection</h2>
+                <p>The AI agent was most useful for translating requirements into a testable architecture and checking edge cases across game states. Human judgment was still necessary for scope, visual style, honest documentation, and deciding whether each feature improved the product.</p>
+                <p>The result goes beyond an isolated prompt: it has explicit requirements, persistent state, input handling, collision rules, time-based movement, responsive controls, documentation, and a repeatable test plan.</p>
+                <p><a class="button button-primary" href="thesis-defense.html">Play Defend Your Thesis →</a> <a class="button button-secondary" href="assignment4-report.md">View Markdown source</a></p>
+            </article>
+            <aside class="panel doc-nav">
+                <h3>On this page</h3>
+                <a href="#summary">Project summary</a><a href="#requirements">Requirements</a><a href="#gameplay">Gameplay</a><a href="#architecture">Architecture</a><a href="#ai">AI architecture</a><a href="#problems">Problem solving</a><a href="#tests">Testing</a><a href="#challenges">Challenges</a><a href="#limitations">Limitations</a><a href="#reflection">Reflection</a>
+            </aside>
+        </div>
+    </main>
+</body>
+</html>

@@ -2,55 +2,232 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Lizihan's Software Technology Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Lizihan's Software Technology course portfolio, featuring AI agents, an interactive browser game, and technical reports.">
+    <title>Lizihan | Software Technology Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="site.js" defer></script>
 </head>
 <body>
-    <header>
-        <h1>Lizihan's Software Technology Blog</h1>
-        <p>A personal static website for documenting my learning process in the Software Technology course.</p>
+    <div class="page-glow page-glow-one" aria-hidden="true"></div>
+    <div class="page-glow page-glow-two" aria-hidden="true"></div>
+
+    <header class="site-header">
+        <a class="brand" href="index.html" aria-label="Lizihan home">
+            <span class="brand-mark">LZ</span>
+            <span>Lizihan Lab</span>
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+            <span></span><span></span><span></span>
+            <span class="sr-only">Toggle navigation</span>
+        </button>
+        <nav id="site-nav" class="site-nav" aria-label="Main navigation">
+            <a class="active" href="index.html">Home</a>
+            <a href="agent-lab.html">Agent Lab</a>
+            <a href="thesis-defense.html">Thesis Defense</a>
+            <a href="#archive">Archive</a>
+        </nav>
     </header>
 
     <main>
-        <section class="card">
-            <h2>About This Website</h2>
-            <p>
-                This website is built as a static personal blog using HTML, CSS, Markdown, Git, and GitHub Pages.
-                It records my course assignments, development process, and learning notes.
-            </p>
+        <section class="hero shell">
+            <div class="hero-copy" data-reveal>
+                <p class="eyebrow"><span class="status-dot"></span> Software Technology Portfolio · 2026</p>
+                <h1>Building useful things,<br><span>one experiment at a time.</span></h1>
+                <p class="hero-lead">
+                    A living course portfolio about AI agents, human-AI collaboration,
+                    and turning rough ideas into software people can actually use.
+                </p>
+                <div class="hero-actions">
+                    <a class="button button-primary" href="thesis-defense.html">
+                        Play latest project <span aria-hidden="true">→</span>
+                    </a>
+                    <a class="button button-secondary" href="agent-lab.html">Open Agent Lab</a>
+                </div>
+                <dl class="hero-stats" aria-label="Portfolio statistics">
+                    <div><dt>04</dt><dd>Assignments</dd></div>
+                    <div><dt>02</dt><dd>Interactive apps</dd></div>
+                    <div><dt>100%</dt><dd>Static & open</dd></div>
+                </dl>
+            </div>
+
+            <div class="hero-visual" data-reveal>
+                <div class="orbit orbit-one" aria-hidden="true"></div>
+                <div class="orbit orbit-two" aria-hidden="true"></div>
+                <div class="code-window">
+                    <div class="window-bar">
+                        <span></span><span></span><span></span>
+                        <p>build-log.js</p>
+                    </div>
+                    <div class="code-lines" aria-label="Decorative code sample">
+                        <p><i>01</i><span class="code-purple">const</span> idea = <span class="code-green">"learn by building"</span>;</p>
+                        <p><i>02</i><span class="code-purple">const</span> tools = [<span class="code-green">"AI"</span>, <span class="code-green">"code"</span>, <span class="code-green">"curiosity"</span>];</p>
+                        <p><i>03</i></p>
+                        <p><i>04</i><span class="code-blue">while</span> (idea.needsWork) {</p>
+                        <p><i>05</i>&nbsp;&nbsp;idea.<span class="code-yellow">prototype</span>();</p>
+                        <p><i>06</i>&nbsp;&nbsp;idea.<span class="code-yellow">test</span>();</p>
+                        <p><i>07</i>&nbsp;&nbsp;idea.<span class="code-yellow">improve</span>();</p>
+                        <p><i>08</i>}</p>
+                        <p><i>09</i><span class="code-purple">export default</span> <span class="code-green">"something useful"</span>;</p>
+                    </div>
+                    <div class="terminal-line"><span>➜</span> deployed to GitHub Pages <b>✓</b></div>
+                </div>
+                <div class="float-card float-card-top">
+                    <span class="mini-icon">AI</span>
+                    <div><strong>Agent ready</strong><small>3 modes available</small></div>
+                </div>
+                <div class="float-card float-card-bottom">
+                    <span class="mini-icon mini-icon-warm">+1</span>
+                    <div><strong>New high score</strong><small>Thesis defended</small></div>
+                </div>
+            </div>
         </section>
 
-        <section class="card">
-            <h2>Homework 1: Command Line and Documentation</h2>
-            <ul>
-                <li><a href="report.pdf">View PDF Report</a></li>
-                <li><a href="report.md">View Markdown Report</a></li>
-                <li><a href="matmul.py">View Python Source Code</a></li>
-                <li><a href="system_info.txt">View System Information</a></li>
-                <li><a href="result_python.txt">View Python Running Output</a></li>
-            </ul>
+        <section class="section shell" id="projects">
+            <div class="section-heading" data-reveal>
+                <div>
+                    <p class="eyebrow">Featured work</p>
+                    <h2>From prompts to products.</h2>
+                </div>
+                <p>Two hands-on assignments that explore different sides of AI-assisted software development.</p>
+            </div>
+
+            <div class="featured-grid">
+                <article class="project-card project-card-agent" data-reveal>
+                    <div class="project-topline">
+                        <span class="project-number">03</span>
+                        <span class="tag">AI Agents</span>
+                    </div>
+                    <div class="project-graphic agent-graphic" aria-hidden="true">
+                        <div class="agent-node node-center">AI</div>
+                        <div class="agent-node node-file">FILE</div>
+                        <div class="agent-node node-web">API</div>
+                        <div class="agent-node node-local">LOCAL</div>
+                        <svg viewBox="0 0 400 210" role="presentation">
+                            <path d="M198 104 C145 80, 120 67, 77 55"></path>
+                            <path d="M205 102 C259 77, 280 61, 326 49"></path>
+                            <path d="M202 110 C244 139, 267 153, 309 166"></path>
+                        </svg>
+                    </div>
+                    <div class="project-copy">
+                        <p class="project-kicker">Assignment 3</p>
+                        <h3>Agent Deployment & Integration</h3>
+                        <p>Analyze files with a browser agent, connect an online LLM, or send the same task to a local Ollama model.</p>
+                        <div class="project-links">
+                            <a href="agent-lab.html">Launch Agent Lab <span>→</span></a>
+                            <a href="assignment3-report.html">Read report</a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="project-card project-card-game" data-reveal>
+                    <div class="project-topline">
+                        <span class="project-number">04</span>
+                        <span class="tag tag-warm">Browser Game</span>
+                    </div>
+                    <div class="project-graphic game-graphic" aria-hidden="true">
+                        <div class="pixel-grid"></div>
+                        <div class="thesis-core-mini"><span>THESIS</span></div>
+                        <div class="player-mini"></div>
+                        <span class="enemy-mini enemy-one">BUG</span>
+                        <span class="enemy-mini enemy-two">DUE</span>
+                        <span class="enemy-mini enemy-three">R2</span>
+                        <span class="shot-mini shot-one"></span>
+                        <span class="shot-mini shot-two"></span>
+                    </div>
+                    <div class="project-copy">
+                        <p class="project-kicker">Assignment 4</p>
+                        <h3>Defend Your Thesis</h3>
+                        <p>A polished survival game about protecting research from bugs, deadlines, and relentless peer reviewers.</p>
+                        <div class="project-links">
+                            <a href="thesis-defense.html">Play in browser <span>→</span></a>
+                            <a href="assignment4-report.html">Read report</a>
+                        </div>
+                    </div>
+                </article>
+            </div>
         </section>
 
-        <section class="card">
-            <h2>Homework 2: Static Personal Blog Website</h2>
-            <ul>
-                <li><a href="homework2_report.html">View Homework 2 HTML Report</a></li>
-                <li><a href="homework2_report.md">View Homework 2 Markdown Report</a></li>
-            </ul>
+        <section class="section shell process-section">
+            <div class="section-heading compact" data-reveal>
+                <div>
+                    <p class="eyebrow">How I work</p>
+                    <h2>A small, repeatable loop.</h2>
+                </div>
+            </div>
+            <div class="process-grid">
+                <article data-reveal><span>01</span><h3>Frame</h3><p>Turn a broad brief into concrete user stories and testable requirements.</p></article>
+                <article data-reveal><span>02</span><h3>Prototype</h3><p>Build the smallest working version and learn from real interaction.</p></article>
+                <article data-reveal><span>03</span><h3>Collaborate</h3><p>Use AI for architecture, debugging, alternatives, and focused review.</p></article>
+                <article data-reveal><span>04</span><h3>Refine</h3><p>Test edge cases, improve the interface, and document every decision.</p></article>
+            </div>
         </section>
 
-        <section class="card">
-            <h2>Project Log</h2>
-            <p>
-                The website was first created with simple HTML. Then I added links to Homework 1,
-                improved the page style with CSS, wrote a Markdown report for Homework 2,
-                and deployed the website through GitHub Pages.
-            </p>
+        <section class="section shell" id="archive">
+            <div class="section-heading" data-reveal>
+                <div>
+                    <p class="eyebrow">Course archive</p>
+                    <h2>The work behind the work.</h2>
+                </div>
+                <p>Reports, source files, outputs, and earlier experiments remain available for review.</p>
+            </div>
+            <div class="archive-list" data-reveal>
+                <article>
+                    <div class="archive-index">01</div>
+                    <div><p>Assignment 1</p><h3>Command Line & Documentation</h3></div>
+                    <div class="archive-tags"><span>Python</span><span>Linux</span><span>Benchmarking</span></div>
+                    <div class="archive-actions">
+                        <a href="report.pdf">PDF</a>
+                        <a href="report.md">Markdown</a>
+                        <a href="matmul.py">Source</a>
+                    </div>
+                </article>
+                <article>
+                    <div class="archive-index">02</div>
+                    <div><p>Assignment 2</p><h3>Static Personal Website</h3></div>
+                    <div class="archive-tags"><span>HTML</span><span>CSS</span><span>GitHub Pages</span></div>
+                    <div class="archive-actions">
+                        <a href="homework2_report.html">Report</a>
+                        <a href="homework2_report.md">Markdown</a>
+                    </div>
+                </article>
+                <article>
+                    <div class="archive-index">03</div>
+                    <div><p>Assignment 3</p><h3>AI Agent Lab</h3></div>
+                    <div class="archive-tags"><span>LLM</span><span>Ollama</span><span>File analysis</span></div>
+                    <div class="archive-actions">
+                        <a href="agent-lab.html">Demo</a>
+                        <a href="assignment3-report.md">Markdown</a>
+                    </div>
+                </article>
+                <article>
+                    <div class="archive-index">04</div>
+                    <div><p>Assignment 4</p><h3>Defend Your Thesis</h3></div>
+                    <div class="archive-tags"><span>Canvas</span><span>Game loop</span><span>AI-assisted</span></div>
+                    <div class="archive-actions">
+                        <a href="thesis-defense.html">Game</a>
+                        <a href="assignment4-report.md">Markdown</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="cta-section shell" data-reveal>
+            <div>
+                <p class="eyebrow">Current status</p>
+                <h2>Still learning. Already shipping.</h2>
+            </div>
+            <a class="button button-light" href="https://github.com/lizihanFly/lizihanFly.github.io" target="_blank" rel="noreferrer">View source on GitHub ↗</a>
         </section>
     </main>
 
-    <footer>
-        <p>Created for Software Technology coursework.</p>
+    <footer class="site-footer shell">
+        <a class="brand" href="index.html"><span class="brand-mark">LZ</span><span>Lizihan Lab</span></a>
+        <p>Designed and built for Software Technology coursework.</p>
+        <p>© <span data-year>2026</span> Lizihan</p>
     </footer>
 </body>
 </html>

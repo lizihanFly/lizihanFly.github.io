@@ -1,0 +1,4 @@
+# Local browser profiles and screenshots created during visual testing
+.edge-home/
+.chrome-*/
+*-check.png

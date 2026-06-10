@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Defend Your Thesis, a browser survival game built for Assignment 4.">
+    <title>Defend Your Thesis | Lizihan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="thesis-defense.css">
+    <script src="site.js" defer></script>
+    <script src="thesis-defense.js" defer></script>
+</head>
+<body class="game-page">
+    <header class="site-header">
+        <a class="brand" href="index.html"><span class="brand-mark">LZ</span><span>Lizihan Lab</span></a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+            <span></span><span></span><span></span><span class="sr-only">Toggle navigation</span>
+        </button>
+        <nav id="site-nav" class="site-nav" aria-label="Main navigation">
+            <a href="index.html">Home</a>
+            <a href="agent-lab.html">Agent Lab</a>
+            <a class="active" href="thesis-defense.html">Thesis Defense</a>
+            <a href="assignment4-report.html">Report</a>
+        </nav>
+    </header>
+
+    <main class="inner-main">
+        <section class="game-heading shell" data-reveal>
+            <div>
+                <p class="breadcrumb"><a href="index.html">Home</a> / Assignment 4</p>
+                <p class="eyebrow">AI-Assisted Application · Option A</p>
+                <h1>Defend Your <span>Thesis.</span></h1>
+            </div>
+            <p>Bugs. Deadlines. Reviewer #2. Your research has survived too much to end here.</p>
+        </section>
+
+        <section class="game-frame shell" data-reveal>
+            <div class="game-topbar">
+                <div class="game-title-group">
+                    <span class="live-dot"></span>
+                    <strong>THESIS DEFENSE PROTOCOL</strong>
+                    <small id="game-state-label">Awaiting candidate</small>
+                </div>
+                <div class="game-actions">
+                    <button id="sound-toggle" type="button" aria-label="Toggle sound">Sound: On</button>
+                    <button id="pause-button" type="button" disabled>Pause</button>
+                    <button id="fullscreen-button" type="button">Fullscreen</button>
+                </div>
+            </div>
+
+            <div id="game-stage" class="game-stage">
+                <canvas id="game-canvas" width="960" height="600" aria-label="Defend Your Thesis game canvas"></canvas>
+
+                <div id="start-screen" class="game-overlay start-screen">
+                    <div class="start-copy">
+                        <p class="tiny-label">RESEARCH SURVIVAL SIMULATOR</p>
+                        <h2>Choose your candidate</h2>
+                        <p>Each researcher has a different way of handling academic pressure.</p>
+                    </div>
+                    <div class="character-grid">
+                        <button class="character-card selected" type="button" data-character="analyst">
+                            <span class="character-art analyst-art"><i></i></span>
+                            <span class="character-name">The Analyst</span>
+                            <span class="character-role">Balanced researcher</span>
+                            <span class="stat-row"><i>Speed</i><b><em style="width: 72%"></em></b></span>
+                            <span class="stat-row"><i>Fire rate</i><b><em style="width: 68%"></em></b></span>
+                            <span class="stat-row"><i>Impact</i><b><em style="width: 70%"></em></b></span>
+                            <span class="perk">PERK · Reliable Methods</span>
+                        </button>
+                        <button class="character-card" type="button" data-character="hacker">
+                            <span class="character-art hacker-art"><i></i></span>
+                            <span class="character-name">The Hacker</span>
+                            <span class="character-role">Fast experimentalist</span>
+                            <span class="stat-row"><i>Speed</i><b><em style="width: 92%"></em></b></span>
+                            <span class="stat-row"><i>Fire rate</i><b><em style="width: 88%"></em></b></span>
+                            <span class="stat-row"><i>Impact</i><b><em style="width: 46%"></em></b></span>
+                            <span class="perk">PERK · Rapid Prototype</span>
+                        </button>
+                        <button class="character-card" type="button" data-character="writer">
+                            <span class="character-art writer-art"><i></i></span>
+                            <span class="character-name">The Writer</span>
+                            <span class="character-role">Heavy citation specialist</span>
+                            <span class="stat-row"><i>Speed</i><b><em style="width: 50%"></em></b></span>
+                            <span class="stat-row"><i>Fire rate</i><b><em style="width: 48%"></em></b></span>
+                            <span class="stat-row"><i>Impact</i><b><em style="width: 96%"></em></b></span>
+                            <span class="perk">PERK · Strong Argument</span>
+                        </button>
+                    </div>
+                    <button id="start-button" class="start-button" type="button">Begin defense <span>→</span></button>
+                    <p class="control-hint">Move: WASD / arrow keys · Aim: mouse · Fire: click or space · Pause: P</p>
+                </div>
+
+                <div id="hud" class="game-hud hidden">
+                    <div class="hud-left">
+                        <div class="hud-card"><span>WAVE</span><strong id="wave-value">1</strong></div>
+                        <div class="hud-card"><span>SCORE</span><strong id="score-value">00000</strong></div>
+                        <div class="hud-card"><span>COMBO</span><strong id="combo-value">x1</strong></div>
+                    </div>
+                    <div class="hud-right">
+                        <div class="health-block">
+                            <div><span>THESIS INTEGRITY</span><strong id="health-value">100%</strong></div>
+                            <div class="health-track"><i id="health-fill"></i></div>
+                        </div>
+                    </div>
+                    <div id="wave-banner" class="wave-banner">WAVE 1 <span>Literature Review</span></div>
+                </div>
+
+                <div id="pause-screen" class="game-overlay compact-overlay hidden">
+                    <p class="tiny-label">DEFENSE SUSPENDED</p>
+                    <h2>Peer review paused.</h2>
+                    <button id="resume-button" class="start-button" type="button">Resume</button>
+                </div>
+
+                <div id="game-over-screen" class="game-overlay compact-overlay hidden">
+                    <p class="tiny-label">COMMITTEE DECISION</p>
+                    <h2 id="result-title">Major revisions required.</h2>
+                    <div class="result-grid">
+                        <div><span>Final score</span><strong id="final-score">0</strong></div>
+                        <div><span>Wave reached</span><strong id="final-wave">1</strong></div>
+                        <div><span>Best score</span><strong id="best-score">0</strong></div>
+                    </div>
+                    <p id="result-note">The thesis fell, but the research question remains.</p>
+                    <div class="result-actions">
+                        <button id="restart-button" class="start-button" type="button">Defend again</button>
+                        <button id="change-character" class="secondary-game-button" type="button">Change candidate</button>
+                    </div>
+                </div>
+
+                <div class="touch-controls" aria-label="Touch controls">
+                    <div class="touch-dpad">
+                        <button type="button" data-key="ArrowUp">↑</button>
+                        <button type="button" data-key="ArrowLeft">←</button>
+                        <button type="button" data-key="ArrowDown">↓</button>
+                        <button type="button" data-key="ArrowRight">→</button>
+                    </div>
+                    <button id="touch-fire" class="touch-fire" type="button">CITE</button>
+                </div>
+            </div>
+
+            <div class="game-legend">
+                <div><span class="legend-enemy bug-color">B</span><p><strong>Bug</strong><small>Persistent, ordinary damage</small></p></div>
+                <div><span class="legend-enemy deadline-color">D</span><p><strong>Deadline</strong><small>Fast and hard to avoid</small></p></div>
+                <div><span class="legend-enemy reviewer-color">R2</span><p><strong>Reviewer #2</strong><small>Slow, tough, devastating</small></p></div>
+                <div><span class="legend-power">+</span><p><strong>Coffee & citations</strong><small>Restore integrity or boost fire</small></p></div>
+            </div>
+        </section>
+
+        <section class="game-details shell">
+            <article class="panel" data-reveal>
+                <span>01</span><h3>Protect the research</h3><p>Enemies target the thesis at the center. Letting them through reduces its integrity.</p>
+            </article>
+            <article class="panel" data-reveal>
+                <span>02</span><h3>Build a combo</h3><p>Quick eliminations increase the score multiplier. Taking too long resets it.</p>
+            </article>
+            <article class="panel" data-reveal>
+                <span>03</span><h3>Survive the committee</h3><p>Every wave is longer and tougher. Reviewer #2 begins appearing from wave three.</p>
+            </article>
+            <article class="panel report-detail" data-reveal>
+                <div><p class="eyebrow">Behind the build</p><h3>Architecture, AI collaboration, bugs, and tests.</h3></div>
+                <a class="button button-primary" href="assignment4-report.html">Read project report →</a>
+            </article>
+        </section>
+    </main>
+
+    <footer class="site-footer shell">
+        <a class="brand" href="index.html"><span class="brand-mark">LZ</span><span>Lizihan Lab</span></a>
+        <p>Assignment 4 · AI-Assisted Application</p>
+        <p>© <span data-year>2026</span> Lizihan</p>
+    </footer>
+</body>
+</html>
