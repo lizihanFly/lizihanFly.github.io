@@ -20,6 +20,8 @@ Defend Your Thesis is a survival-defense game that runs entirely in a web browse
 
 The application is a stable URL rather than an executable file. It uses only HTML, CSS, the Canvas 2D API, and JavaScript, so GitHub Pages can host it without a build step.
 
+The second gameplay iteration adds a roguelite-style build system, character abilities, dashing, special enemy behavior, and boss waves. These additions preserve the original defense-game brief while making repeated runs meaningfully different.
+
 ## 2. Requirement Mapping
 
 | Requirement | Implementation |
@@ -30,6 +32,9 @@ The application is a stable URL rather than an executable file. It uses only HTM
 | Keyboard controls | WASD/arrows, mouse aim, click/space fire, P/Escape pause |
 | Mouse controls | Pointer aiming and click-to-fire |
 | Mobile controls | On-screen directional pad and auto-aim fire button |
+| Strategic progression | Three-choice upgrade draft after every cleared wave |
+| Active abilities | A different `E` skill for every character and a reusable dash |
+| Enemy variety | Splitting, shielded, ranged, and boss enemies |
 | AI-assisted architecture | Documented in Section 5 |
 | AI-assisted problem solving | Documented in Section 6 |
 | Markdown report | This file |
@@ -44,7 +49,9 @@ The application is a stable URL rather than an executable file. It uses only HTM
 4. Stop enemies before they reach the thesis.
 5. Build a score combo through quick eliminations.
 6. Collect coffee or citation power-ups.
-7. Survive increasingly difficult waves.
+7. Choose one of three research upgrades after each wave.
+8. Combine upgrades into a specialized build.
+9. Defeat the Committee Chair every fifth wave.
 
 ### Character design
 
@@ -53,6 +60,27 @@ The application is a stable URL rather than an executable file. It uses only HTM
 | Analyst | Balanced speed, fire rate, and damage | No extreme advantage |
 | Hacker | Highest movement and fire rate | Low damage per shot |
 | Writer | Highest damage per citation | Slow movement and fire rate |
+
+Each character also has a unique active ability:
+
+- **Analyst - Method Freeze:** slows every current enemy for several seconds.
+- **Hacker - Hotfix Pulse:** deals radial damage around the player.
+- **Writer - Citation Storm:** temporarily adds projectiles and greatly increases fire rate.
+
+All characters can dash with `Shift`. Dashing repositions the player quickly and briefly avoids boss projectiles.
+
+### Research build system
+
+After clearing a wave, the player chooses one of three random upgrades. Available upgrades include damage, fire rate, multi-shot, piercing, critical chance, movement, ability cooldown, damage reduction, a renewable thesis shield, automatic repair, projectile velocity, and orbiting research assistants.
+
+Choices are filtered when an upgrade reaches its cap. This prevents invalid choices such as unlimited multi-shot or excessive critical chance.
+
+### Special enemies and boss waves
+
+- **Replicator:** splits into two bugs when destroyed.
+- **Paywall:** has a separate shield that must be removed before health is damaged.
+- **Reviewer #2:** uses a curved movement pattern and deals heavy thesis damage.
+- **Committee Chair:** appears every fifth wave, stops at range, fires projectile volleys, and summons additional threats.
 
 ### Progression
 
@@ -66,19 +94,23 @@ The game uses a state-driven update/render loop:
 Input events
     |
     v
-Update player -> bullets -> enemies -> collisions -> wave manager
+Update player -> abilities -> drones -> bullets -> enemies -> projectiles
     |
     v
-Update score, health, combo, particles, and power-ups
+Resolve collisions -> score -> shield -> combo -> power-ups
     |
     v
-Render background -> thesis -> entities -> effects -> HUD
+Wave manager -> upgrade draft -> next wave / boss event
+    |
+    v
+Render arena -> entities -> effects -> boss bar -> HUD
 ```
 
 Main data groups:
 
 - `characterStats`: movement, fire delay, damage, and bullet speed.
 - `enemyTypes`: health, speed, radius, core damage, and score.
+- `upgradePool`: upgrade availability rules and effects.
 - `game`: current runtime state.
 - `ui`: references to HUD and overlay elements.
 - `keys` and `pointer`: keyboard, mouse, and touch input state.
@@ -97,7 +129,9 @@ The AI agent helped turn the assignment brief into the following modules:
 4. Keyboard, mouse, and touch input.
 5. A wave and difficulty manager.
 6. Collision detection and entity cleanup.
-7. A documentation and testing plan.
+7. A data-driven upgrade system.
+8. Character abilities, enemy projectiles, and boss state.
+9. A documentation and testing plan.
 
 The final decision was to avoid a framework because the project has one game scene, no server state, and an existing static deployment. This reduced dependency risk and made the source easy to inspect.
 
@@ -121,6 +155,16 @@ Early game logic could have tied speed to frame count. The implementation instea
 
 Keyboard and on-screen direction buttons write to the same `keys` object. Mouse clicks and the touch fire button write to the same `pointer.down` state. This keeps the game logic independent from the physical input method.
 
+The same principle is used for active actions: keyboard `E` and `Shift` call the same ability and dash functions as the mobile buttons.
+
+### Upgrade state management
+
+The upgrade screen pauses simulation without ending the animation loop. Enemy movement and projectiles stop while the player makes a decision. After one valid choice is applied, the game safely advances to the next wave and refills any renewable shield.
+
+### Complex enemy lifecycle
+
+Enemy destruction can now produce new enemies, as with the Replicator. Destruction is processed by stable IDs and reverse array iteration so spawned children do not corrupt the current collision pass. Boss projectiles use a separate entity collection because they have different collision rules from player citations.
+
 ### Browser audio
 
 The Web Audio API cannot start before user interaction. Audio initialization therefore occurs only after the player presses **Begin defense**. Sound effects are generated with short oscillators, so no copyrighted audio assets or external downloads are required.
@@ -143,7 +187,14 @@ The game contains no user accounts or private data. Only the best score is store
 | Enemy reaches thesis | Thesis integrity decreases |
 | Integrity reaches zero | Game-over overlay appears |
 | Press P or Escape | Game pauses and resumes |
-| Clear a wave | Next wave begins after a short break |
+| Clear a wave | Three valid upgrade cards appear and simulation pauses |
+| Choose upgrade or press 1/2/3 | Effect applies once and next wave begins |
+| Press E for each character | Correct unique ability activates and enters cooldown |
+| Press Shift | Player dashes, stays in bounds, and enters cooldown |
+| Destroy Replicator | Two smaller bugs spawn |
+| Shoot Paywall | Shield is reduced before health |
+| Reach wave 5 | Committee Chair spawns with boss health bar |
+| Wait during boss fight | Boss fires volleys and summons enemies |
 | Collect coffee | Thesis integrity increases, capped at 100 |
 | Collect citation boost | Fire rate increases temporarily |
 | Finish a run | Best score is saved locally |
@@ -160,7 +211,7 @@ The game contains no user accounts or private data. Only the best score is store
 
 ### Balancing
 
-The three characters needed to feel different without making one obviously superior. Their movement, fire delay, damage, and projectile speed are stored as data so values can be tuned without rewriting logic.
+The three characters needed to feel different without making one obviously superior. Character and upgrade values are stored as data so they can be tuned without rewriting logic.
 
 ### Responsive game controls
 
@@ -168,15 +219,14 @@ A desktop game normally assumes keyboard and mouse input. The mobile layout incl
 
 ### Readable feedback
 
-Many simultaneous enemies can make a game difficult to read. Color, shape, labels, health bars, particles, screen shake, and short synthesized tones provide several types of feedback without requiring image or audio files.
+Many simultaneous enemies can make a game difficult to read. Color, shape, labels, shields, health bars, a boss bar, particles, screen shake, and short synthesized tones provide several types of feedback without requiring image or audio files.
 
 ## 9. Limitations and Future Work
 
-- Enemy movement uses direct paths rather than pathfinding.
 - The game has one arena and no narrative level transitions.
 - Difficulty is tuned heuristically and would benefit from user playtest data.
 - Browser best scores are local to one device.
-- Future versions could add boss behaviors, upgrades, accessibility settings, and an online leaderboard.
+- Future versions could add more arenas, accessibility settings, build statistics, and an online leaderboard.
 
 ## 10. Reflection
 

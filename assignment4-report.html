@@ -43,7 +43,7 @@
                 </table>
 
                 <h2 id="gameplay">3. Gameplay</h2>
-                <p>The player selects a candidate, moves around the arena, fires citations, protects thesis integrity, builds a combo, collects power-ups, and survives progressively harder waves.</p>
+                <p>The player selects a candidate, moves around the arena, fires citations, protects thesis integrity, builds a combo, collects power-ups, and survives progressively harder waves. After every cleared wave, a three-choice research draft lets the player shape a different build.</p>
                 <table>
                     <thead><tr><th>Character</th><th>Strength</th><th>Trade-off</th></tr></thead>
                     <tbody>
@@ -52,15 +52,23 @@
                         <tr><td>Writer</td><td>High citation damage</td><td>Slow movement and fire</td></tr>
                     </tbody>
                 </table>
+                <h3>Active abilities</h3>
+                <p>The Analyst freezes every current enemy, the Hacker releases a radial Hotfix Pulse, and the Writer starts a temporary Citation Storm. Every character can also dash with <code>Shift</code> to reposition and briefly avoid boss projectiles.</p>
+                <h3>Research upgrades</h3>
+                <p>The upgrade pool includes damage, fire rate, multi-shot, piercing, critical chance, movement, cooldown reduction, armor, renewable thesis shields, automatic repair, projectile velocity, and orbiting research assistants.</p>
+                <h3>Special enemies</h3>
+                <p>Replicators split on death, Paywalls protect their health with a shield, Reviewer #2 follows a curved approach, and the Committee Chair appears every fifth wave with ranged volleys and summoned threats.</p>
 
                 <h2 id="architecture">4. Architecture</h2>
                 <pre>Input events
     |
-Update player -> bullets -> enemies -> collisions
+Update player -> abilities -> drones -> projectiles
     |
-Wave manager -> score -> health -> power-ups
+Collisions -> score -> shield -> combo -> power-ups
     |
-Render arena -> thesis -> entities -> effects -> HUD</pre>
+Wave manager -> upgrade draft -> next wave / boss
+    |
+Render arena -> entities -> effects -> boss bar -> HUD</pre>
                 <p>The game uses <code>requestAnimationFrame</code> and delta-time movement. A 0.033-second cap prevents large jumps after a browser tab returns from the background. Data objects define character and enemy balance separately from runtime logic.</p>
 
                 <h2 id="ai">5. AI-Assisted Architecture</h2>
@@ -71,7 +79,9 @@ Render arena -> thesis -> entities -> effects -> HUD</pre>
                 <h3>Collision detection</h3>
                 <p>Circle-based collision checks are used for bullets, enemies, the player, power-ups, and the thesis: <code>distance(a, b) &lt; radius(a) + radius(b)</code>.</p>
                 <h3>Input unification</h3>
-                <p>Keyboard and on-screen direction controls write to the same key state. Mouse clicks and the touch fire button use the same firing state. Core game logic therefore does not depend on one physical device.</p>
+                <p>Keyboard and on-screen controls write to the same input state. Mouse and touch use the same firing logic, while keyboard and mobile skill buttons call the same ability and dash functions.</p>
+                <h3>Upgrade and enemy lifecycle</h3>
+                <p>The upgrade overlay pauses simulation without stopping rendering. Enemy IDs and reverse iteration keep collision handling stable when Replicators create new enemies. Boss projectiles use a separate collection because they obey different collision rules.</p>
                 <h3>Browser audio</h3>
                 <p>Web Audio is initialized only after the Begin Defense button is pressed, satisfying browser autoplay rules. Short synthesized tones avoid copyrighted assets and network downloads.</p>
 
@@ -85,18 +95,22 @@ Render arena -> thesis -> entities -> effects -> HUD</pre>
                         <tr><td>Enemy reaches core</td><td>Thesis integrity decreases</td></tr>
                         <tr><td>Integrity reaches zero</td><td>Game-over result appears</td></tr>
                         <tr><td>Press P/Escape</td><td>Game pauses and resumes</td></tr>
-                        <tr><td>Clear wave</td><td>Bonus and next wave begin</td></tr>
+                        <tr><td>Clear wave</td><td>Three upgrade choices appear and simulation pauses</td></tr>
+                        <tr><td>Choose upgrade</td><td>Effect applies once and next wave begins</td></tr>
+                        <tr><td>Press E / Shift</td><td>Unique skill or dash activates and enters cooldown</td></tr>
+                        <tr><td>Destroy Replicator</td><td>Two smaller bugs spawn</td></tr>
+                        <tr><td>Reach wave 5</td><td>Committee Chair and boss health bar appear</td></tr>
+                        <tr><td>Wait during boss</td><td>Boss fires volleys and summons threats</td></tr>
                         <tr><td>Collect power-up</td><td>Integrity or fire rate improves</td></tr>
                         <tr><td>Finish run</td><td>Best score persists in local storage</td></tr>
                     </tbody>
                 </table>
 
                 <h2 id="challenges">8. Challenges</h2>
-                <p>Character balance is stored as data so it can be tuned without rewriting game logic. Mobile input required an auto-aim option because touch devices cannot comfortably combine movement and precise pointer aiming. Readability is supported through color, shape, labels, health bars, particles, screen shake, and sound.</p>
+                <p>Character and upgrade balance is stored as data so it can be tuned without rewriting game logic. Mobile input required auto-aim and dedicated skill buttons. Readability is supported through color, shape, labels, shields, health bars, a boss bar, particles, screen shake, and sound.</p>
 
                 <h2 id="limitations">9. Limitations</h2>
                 <ul>
-                    <li>Enemies use direct movement instead of pathfinding.</li>
                     <li>The game currently contains one arena.</li>
                     <li>Difficulty needs broader user playtesting.</li>
                     <li>Best scores remain local to one browser.</li>

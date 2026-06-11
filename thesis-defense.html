@@ -68,7 +68,7 @@
                             <span class="stat-row"><i>Speed</i><b><em style="width: 72%"></em></b></span>
                             <span class="stat-row"><i>Fire rate</i><b><em style="width: 68%"></em></b></span>
                             <span class="stat-row"><i>Impact</i><b><em style="width: 70%"></em></b></span>
-                            <span class="perk">PERK · Reliable Methods</span>
+                            <span class="perk">SKILL · Method Freeze (E)</span>
                         </button>
                         <button class="character-card" type="button" data-character="hacker">
                             <span class="character-art hacker-art"><i></i></span>
@@ -77,7 +77,7 @@
                             <span class="stat-row"><i>Speed</i><b><em style="width: 92%"></em></b></span>
                             <span class="stat-row"><i>Fire rate</i><b><em style="width: 88%"></em></b></span>
                             <span class="stat-row"><i>Impact</i><b><em style="width: 46%"></em></b></span>
-                            <span class="perk">PERK · Rapid Prototype</span>
+                            <span class="perk">SKILL · Hotfix Pulse (E)</span>
                         </button>
                         <button class="character-card" type="button" data-character="writer">
                             <span class="character-art writer-art"><i></i></span>
@@ -86,11 +86,11 @@
                             <span class="stat-row"><i>Speed</i><b><em style="width: 50%"></em></b></span>
                             <span class="stat-row"><i>Fire rate</i><b><em style="width: 48%"></em></b></span>
                             <span class="stat-row"><i>Impact</i><b><em style="width: 96%"></em></b></span>
-                            <span class="perk">PERK · Strong Argument</span>
+                            <span class="perk">SKILL · Citation Storm (E)</span>
                         </button>
                     </div>
                     <button id="start-button" class="start-button" type="button">Begin defense <span>→</span></button>
-                    <p class="control-hint">Move: WASD / arrow keys · Aim: mouse · Fire: click or space · Pause: P</p>
+                    <p class="control-hint">Move: WASD / arrows · Fire: click or space · Skill: E · Dash: Shift · Pause: P</p>
                 </div>
 
                 <div id="hud" class="game-hud hidden">
@@ -98,6 +98,7 @@
                         <div class="hud-card"><span>WAVE</span><strong id="wave-value">1</strong></div>
                         <div class="hud-card"><span>SCORE</span><strong id="score-value">00000</strong></div>
                         <div class="hud-card"><span>COMBO</span><strong id="combo-value">x1</strong></div>
+                        <div class="hud-card"><span>BUILD</span><strong id="build-value">0</strong></div>
                     </div>
                     <div class="hud-right">
                         <div class="health-block">
@@ -106,6 +107,26 @@
                         </div>
                     </div>
                     <div id="wave-banner" class="wave-banner">WAVE 1 <span>Literature Review</span></div>
+                    <div class="ability-hud">
+                        <div class="ability-item">
+                            <span class="ability-key">E</span>
+                            <div><small id="skill-name">Method Freeze</small><b><i id="skill-fill"></i></b></div>
+                            <strong id="skill-cooldown">READY</strong>
+                        </div>
+                        <div class="ability-item">
+                            <span class="ability-key">SHIFT</span>
+                            <div><small>Dash</small><b><i id="dash-fill"></i></b></div>
+                            <strong id="dash-cooldown">READY</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="upgrade-screen" class="game-overlay upgrade-screen hidden">
+                    <p class="tiny-label">RESEARCH BREAKTHROUGH</p>
+                    <h2>Choose one upgrade</h2>
+                    <p class="upgrade-subtitle">Your build changes each defense. Pick the idea that fits your strategy.</p>
+                    <div id="upgrade-grid" class="upgrade-grid"></div>
+                    <p class="control-hint">Press 1, 2, or 3 to choose quickly</p>
                 </div>
 
                 <div id="pause-screen" class="game-overlay compact-overlay hidden">
@@ -136,15 +157,21 @@
                         <button type="button" data-key="ArrowDown">↓</button>
                         <button type="button" data-key="ArrowRight">→</button>
                     </div>
-                    <button id="touch-fire" class="touch-fire" type="button">CITE</button>
+                    <div class="touch-actions">
+                        <button id="touch-dash" class="touch-skill" type="button">DASH</button>
+                        <button id="touch-ability" class="touch-skill ability" type="button">SKILL</button>
+                        <button id="touch-fire" class="touch-fire" type="button">CITE</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="game-legend">
+            <div class="game-legend expanded">
                 <div><span class="legend-enemy bug-color">B</span><p><strong>Bug</strong><small>Persistent, ordinary damage</small></p></div>
                 <div><span class="legend-enemy deadline-color">D</span><p><strong>Deadline</strong><small>Fast and hard to avoid</small></p></div>
+                <div><span class="legend-enemy replicator-color">R</span><p><strong>Replicator</strong><small>Splits into two bugs</small></p></div>
+                <div><span class="legend-enemy shield-color">S</span><p><strong>Paywall</strong><small>Protected by a shield</small></p></div>
                 <div><span class="legend-enemy reviewer-color">R2</span><p><strong>Reviewer #2</strong><small>Slow, tough, devastating</small></p></div>
-                <div><span class="legend-power">+</span><p><strong>Coffee & citations</strong><small>Restore integrity or boost fire</small></p></div>
+                <div><span class="legend-enemy boss-color">C</span><p><strong>Committee Chair</strong><small>Boss every fifth wave</small></p></div>
             </div>
         </section>
 
@@ -156,7 +183,7 @@
                 <span>02</span><h3>Build a combo</h3><p>Quick eliminations increase the score multiplier. Taking too long resets it.</p>
             </article>
             <article class="panel" data-reveal>
-                <span>03</span><h3>Survive the committee</h3><p>Every wave is longer and tougher. Reviewer #2 begins appearing from wave three.</p>
+                <span>03</span><h3>Shape your build</h3><p>Choose a new research upgrade after every wave and combine effects into a different strategy each run.</p>
             </article>
             <article class="panel report-detail" data-reveal>
                 <div><p class="eyebrow">Behind the build</p><h3>Architecture, AI collaboration, bugs, and tests.</h3></div>
