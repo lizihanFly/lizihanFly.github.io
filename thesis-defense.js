@@ -1,1305 +1,1219 @@
-const canvas = document.querySelector("#game-canvas");
-const ctx = canvas.getContext("2d");
-const stage = document.querySelector("#game-stage");
+(() => {
+  "use strict";
 
-const ui = {
-    start: document.querySelector("#start-screen"),
-    pause: document.querySelector("#pause-screen"),
-    upgrade: document.querySelector("#upgrade-screen"),
-    upgradeGrid: document.querySelector("#upgrade-grid"),
-    gameOver: document.querySelector("#game-over-screen"),
-    hud: document.querySelector("#hud"),
-    startButton: document.querySelector("#start-button"),
-    pauseButton: document.querySelector("#pause-button"),
-    resumeButton: document.querySelector("#resume-button"),
-    restartButton: document.querySelector("#restart-button"),
-    changeCharacter: document.querySelector("#change-character"),
-    fullscreenButton: document.querySelector("#fullscreen-button"),
-    soundButton: document.querySelector("#sound-toggle"),
-    stateLabel: document.querySelector("#game-state-label"),
-    wave: document.querySelector("#wave-value"),
-    score: document.querySelector("#score-value"),
-    combo: document.querySelector("#combo-value"),
-    build: document.querySelector("#build-value"),
-    health: document.querySelector("#health-value"),
-    healthFill: document.querySelector("#health-fill"),
-    skillName: document.querySelector("#skill-name"),
-    skillFill: document.querySelector("#skill-fill"),
-    skillCooldown: document.querySelector("#skill-cooldown"),
-    dashFill: document.querySelector("#dash-fill"),
-    dashCooldown: document.querySelector("#dash-cooldown"),
-    waveBanner: document.querySelector("#wave-banner"),
-    finalScore: document.querySelector("#final-score"),
-    finalWave: document.querySelector("#final-wave"),
-    bestScore: document.querySelector("#best-score"),
-    resultTitle: document.querySelector("#result-title"),
-    resultNote: document.querySelector("#result-note")
-};
+  const canvas = document.getElementById("game-canvas");
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width;
+  const H = canvas.height;
 
-const characterStats = {
+  const ui = {
+    startScreen: document.getElementById("start-screen"),
+    startButton: document.getElementById("start-button"),
+    characterCards: [...document.querySelectorAll(".character-card")],
+    gameHud: document.getElementById("game-hud"),
+    floor: document.getElementById("floor-value"),
+    room: document.getElementById("room-value"),
+    score: document.getElementById("score-value"),
+    coins: document.getElementById("coin-value"),
+    health: document.getElementById("health-value"),
+    healthFill: document.getElementById("health-fill"),
+    roomBanner: document.getElementById("room-banner"),
+    prompt: document.getElementById("interaction-prompt"),
+    weaponSlots: [document.getElementById("weapon-slot-0"), document.getElementById("weapon-slot-1")],
+    weaponQualities: [document.getElementById("weapon-quality-0"), document.getElementById("weapon-quality-1")],
+    weaponNames: [document.getElementById("weapon-name-0"), document.getElementById("weapon-name-1")],
+    ammo: document.getElementById("ammo-value"),
+    reloadLabel: document.getElementById("reload-label"),
+    skillName: document.getElementById("skill-name"),
+    skillFill: document.getElementById("skill-fill"),
+    skillCooldown: document.getElementById("skill-cooldown"),
+    dashFill: document.getElementById("dash-fill"),
+    dashCooldown: document.getElementById("dash-cooldown"),
+    upgradeScreen: document.getElementById("upgrade-screen"),
+    upgradeGrid: document.getElementById("upgrade-grid"),
+    pauseScreen: document.getElementById("pause-screen"),
+    pauseButton: document.getElementById("pause-button"),
+    resumeButton: document.getElementById("resume-button"),
+    gameOverScreen: document.getElementById("game-over-screen"),
+    finalScore: document.getElementById("final-score"),
+    finalWave: document.getElementById("final-wave"),
+    bestScore: document.getElementById("best-score"),
+    gameOverMessage: document.getElementById("game-over-message"),
+    restartButton: document.getElementById("restart-button"),
+    touchControls: document.getElementById("touch-controls"),
+    touchInteract: document.getElementById("touch-interact"),
+    touchSwap: document.getElementById("touch-swap"),
+    touchReload: document.getElementById("touch-reload"),
+    touchDash: document.getElementById("touch-dash"),
+    touchAbility: document.getElementById("touch-ability"),
+    touchFire: document.getElementById("touch-fire")
+  };
+
+  const qualities = {
+    common: { name: "Common", color: "#aab2c0", mult: 1, mag: 1, label: "C" },
+    uncommon: { name: "Uncommon", color: "#42d483", mult: 1.16, mag: 1.08, label: "U" },
+    rare: { name: "Rare", color: "#4ea7ff", mult: 1.34, mag: 1.14, label: "R" },
+    epic: { name: "Epic", color: "#b278ff", mult: 1.58, mag: 1.22, label: "E" },
+    legendary: { name: "Legendary", color: "#ff9d3b", mult: 1.92, mag: 1.32, label: "L" }
+  };
+
+  const weaponBases = {
+    pistol: {
+      name: "Research Pistol", short: "Pistol", damage: 22, delay: .27, mag: 12,
+      reload: 1.05, speed: 650, pellets: 1, spread: .02, pierce: 0, explosive: 0, color: "#dce4ef"
+    },
+    smg: {
+      name: "Citation SMG", short: "SMG", damage: 10, delay: .085, mag: 30,
+      reload: 1.35, speed: 720, pellets: 1, spread: .1, pierce: 0, explosive: 0, color: "#74dcad"
+    },
+    shotgun: {
+      name: "Scatter Thesis", short: "Shotgun", damage: 12, delay: .58, mag: 7,
+      reload: 1.55, speed: 570, pellets: 6, spread: .38, pierce: 0, explosive: 0, color: "#ffcb72"
+    },
+    railgun: {
+      name: "Peer Review Railgun", short: "Railgun", damage: 63, delay: .76, mag: 5,
+      reload: 1.8, speed: 980, pellets: 1, spread: .008, pierce: 3, explosive: 0, color: "#79c5ff"
+    },
+    laser: {
+      name: "Laser Pointer", short: "Laser", damage: 8, delay: .055, mag: 42,
+      reload: 1.48, speed: 900, pellets: 1, spread: .035, pierce: 1, explosive: 0, color: "#ff6e96"
+    },
+    launcher: {
+      name: "Grant Launcher", short: "Launcher", damage: 38, delay: .82, mag: 4,
+      reload: 1.95, speed: 440, pellets: 1, spread: .03, pierce: 0, explosive: 82, color: "#c692ff"
+    },
+    burst: {
+      name: "Footnote Repeater", short: "Repeater", damage: 16, delay: .145, mag: 21,
+      reload: 1.25, speed: 760, pellets: 1, spread: .055, pierce: 0, explosive: 0, color: "#95e3ec"
+    }
+  };
+
+  const characters = {
     analyst: {
-        color: "#9b87ff",
-        speed: 245,
-        fireDelay: 240,
-        damage: 24,
-        bulletSpeed: 610,
-        skillName: "Method Freeze",
-        skillCooldown: 14
+      name: "Analyst", color: "#5e8dd8", speed: 245, maxHealth: 100, damage: 1.18,
+      skill: "Data Freeze", skillCooldown: 13
     },
     hacker: {
-        color: "#39c9bd",
-        speed: 300,
-        fireDelay: 145,
-        damage: 15,
-        bulletSpeed: 680,
-        skillName: "Hotfix Pulse",
-        skillCooldown: 10
+      name: "Hacker", color: "#45b980", speed: 280, maxHealth: 95, damage: 1,
+      skill: "EMP Pulse", skillCooldown: 10
     },
     writer: {
-        color: "#f0a653",
-        speed: 195,
-        fireDelay: 390,
-        damage: 42,
-        bulletSpeed: 560,
-        skillName: "Citation Storm",
-        skillCooldown: 13
+      name: "Writer", color: "#9a69d3", speed: 230, maxHealth: 125, damage: 1.08,
+      skill: "Citation Storm", skillCooldown: 12
     }
-};
+  };
 
-const enemyTypes = {
-    bug: { color: "#ef5d6a", radius: 15, speed: 62, hp: 36, damage: 9, points: 100, label: "B" },
-    deadline: { color: "#8c6ae8", radius: 13, speed: 108, hp: 27, damage: 12, points: 150, label: "D" },
-    replicator: { color: "#e767ae", radius: 17, speed: 52, hp: 58, damage: 10, points: 220, label: "R" },
-    shield: { color: "#6ed6ee", radius: 18, speed: 49, hp: 62, shield: 55, damage: 15, points: 260, label: "S" },
-    reviewer: { color: "#e38a48", radius: 23, speed: 39, hp: 120, damage: 25, points: 420, label: "R2" },
-    boss: { color: "#d84f73", radius: 39, speed: 31, hp: 850, damage: 38, points: 2500, label: "CHAIR" }
-};
+  const enemyTypes = {
+    bug: { name: "Bug", color: "#ef6678", hp: 42, speed: 95, damage: 12, radius: 17, score: 45 },
+    deadline: { name: "Deadline", color: "#ffb34f", hp: 31, speed: 154, damage: 10, radius: 14, score: 55 },
+    reviewer: { name: "Reviewer", color: "#9876e8", hp: 72, speed: 68, damage: 13, radius: 20, score: 85, ranged: true },
+    replicator: { name: "Replication Error", color: "#54d19a", hp: 55, speed: 83, damage: 10, radius: 18, score: 75, split: true },
+    shield: { name: "Major Revision", color: "#57a9dc", hp: 105, speed: 58, damage: 17, radius: 23, score: 100, armor: .28 },
+    boss: { name: "Final Committee", color: "#e756a5", hp: 670, speed: 52, damage: 22, radius: 43, score: 900, ranged: true, boss: true }
+  };
 
-const waveNames = [
-    "Literature Review",
-    "Methods Chapter",
-    "Data Collection",
-    "Results & Revision",
-    "Committee Meeting",
-    "Final Submission"
-];
+  const talents = [
+    { id: "damage", icon: "DMG", name: "Stronger Argument", text: "+16% weapon damage.", apply: s => s.damageMult *= 1.16 },
+    { id: "health", icon: "HP", name: "Extended Abstract", text: "+25 maximum integrity and heal 30.", apply: s => { s.maxHealth += 25; s.health = Math.min(s.maxHealth, s.health + 30); } },
+    { id: "speed", icon: "SPD", name: "Fast Literature Scan", text: "+12% movement speed.", apply: s => s.speedMult *= 1.12 },
+    { id: "reload", icon: "RLD", name: "Clean Methodology", text: "Reload weapons 20% faster.", apply: s => s.reloadMult *= .8 },
+    { id: "skill", icon: "SKL", name: "Focused Research", text: "Active skill cooldown -22%.", apply: s => s.skillMult *= .78 },
+    { id: "armor", icon: "DEF", name: "Reviewer Response", text: "Take 12% less damage.", apply: s => s.armor = Math.min(.48, s.armor + .12) },
+    { id: "loot", icon: "LCK", name: "Better Evidence", text: "Improve future weapon quality.", apply: s => s.luck += .12 },
+    { id: "ammo", icon: "AMO", name: "Efficient Citations", text: "+35% reserve ammo and refill both weapons.", apply: s => {
+      s.ammoMult *= 1.35;
+      s.inventory.filter(Boolean).forEach(w => { w.reserve = Math.round(w.reserve * 1.35 + w.mag); });
+    } }
+  ];
 
-const upgradePool = [
-    {
-        id: "damage",
-        icon: "+",
-        name: "Stronger Evidence",
-        description: "All citations deal 22% more damage.",
-        tag: "OFFENSE",
-        apply: () => { game.player.damage *= 1.22; }
-    },
-    {
-        id: "fireRate",
-        icon: ">>",
-        name: "Rapid Drafting",
-        description: "Fire 16% faster. Stacks with coffee.",
-        tag: "OFFENSE",
-        apply: () => { game.player.fireDelay *= 0.84; }
-    },
-    {
-        id: "multiShot",
-        icon: "3",
-        name: "Multiple Sources",
-        description: "Fire one additional citation with a small spread.",
-        tag: "PROJECTILE",
-        available: () => game.player.multiShot < 5,
-        apply: () => { game.player.multiShot += 1; }
-    },
-    {
-        id: "pierce",
-        icon: "|",
-        name: "Peer-Reviewed",
-        description: "Citations pierce through one additional enemy.",
-        tag: "PROJECTILE",
-        available: () => game.player.pierce < 4,
-        apply: () => { game.player.pierce += 1; }
-    },
-    {
-        id: "critical",
-        icon: "!",
-        name: "Decisive Result",
-        description: "Gain 12% critical-hit chance for double damage.",
-        tag: "OFFENSE",
-        available: () => game.player.critChance < 0.48,
-        apply: () => { game.player.critChance += 0.12; }
-    },
-    {
-        id: "speed",
-        icon: ">",
-        name: "Efficient Workflow",
-        description: "Move 14% faster and shorten dash cooldown.",
-        tag: "MOBILITY",
-        apply: () => {
-            game.player.speed *= 1.14;
-            game.player.dashCooldownMax *= 0.9;
-        }
-    },
-    {
-        id: "skill",
-        icon: "E",
-        name: "Focused Research",
-        description: "Reduce active-skill cooldown by 18%.",
-        tag: "ABILITY",
-        available: () => game.player.skillCooldownMax > 5,
-        apply: () => { game.player.skillCooldownMax *= 0.82; }
-    },
-    {
-        id: "armor",
-        icon: "%",
-        name: "Ethics Approval",
-        description: "Thesis takes 12% less damage from every source.",
-        tag: "DEFENSE",
-        available: () => game.damageReduction < 0.48,
-        apply: () => { game.damageReduction += 0.12; }
-    },
-    {
-        id: "shield",
-        icon: "S",
-        name: "Grant Funding",
-        description: "Add a 30-point shield that refreshes each wave.",
-        tag: "DEFENSE",
-        apply: () => {
-            game.maxShield += 30;
-            game.coreShield = game.maxShield;
-        }
-    },
-    {
-        id: "repair",
-        icon: "+",
-        name: "Major Revision",
-        description: "Repair 30 integrity now and 5 after each wave.",
-        tag: "RECOVERY",
-        apply: () => {
-            game.coreHealth = Math.min(100, game.coreHealth + 30);
-            game.waveRepair += 5;
-        }
-    },
-    {
-        id: "drone",
-        icon: "AI",
-        name: "Research Assistant",
-        description: "Deploy an orbiting assistant that auto-fires.",
-        tag: "AUTOMATION",
-        available: () => game.drones < 3,
-        apply: () => { game.drones += 1; }
-    },
-    {
-        id: "velocity",
-        icon: "^",
-        name: "Clear Argument",
-        description: "Projectiles travel 20% faster and grow slightly.",
-        tag: "PROJECTILE",
-        apply: () => {
-            game.player.bulletSpeed *= 1.2;
-            game.player.bulletRadius += 0.7;
-        }
+  const roomNames = ["Literature Maze", "Method Lab", "Data Archive", "Revision Hall", "Committee Chamber"];
+  const keys = Object.create(null);
+  const touchKeys = { up: false, down: false, left: false, right: false };
+  const pointer = { x: W * .75, y: H * .5, down: false, inside: false };
+  let selectedCharacter = "analyst";
+  let lastTime = 0;
+  let animationId = 0;
+  let state = null;
+
+  function makeState() {
+    const c = characters[selectedCharacter];
+    return {
+      running: true,
+      paused: false,
+      choosingTalent: false,
+      gameOver: false,
+      floor: 1,
+      room: 1,
+      clearedRooms: 0,
+      roomState: "combat",
+      score: 0,
+      coins: 0,
+      health: c.maxHealth,
+      maxHealth: c.maxHealth,
+      damageMult: c.damage,
+      speedMult: 1,
+      reloadMult: 1,
+      skillMult: 1,
+      ammoMult: 1,
+      armor: 0,
+      luck: 0,
+      player: {
+        x: 120, y: H / 2, radius: 17, angle: 0, color: c.color, speed: c.speed,
+        invulnerable: 0, dashCooldown: 0, dashTime: 0, dashX: 0, dashY: 0,
+        skillCooldown: 0, fireCooldown: 0, reloading: 0
+      },
+      inventory: [createWeapon("pistol", "common"), null],
+      activeSlot: 0,
+      enemies: [],
+      bullets: [],
+      enemyBullets: [],
+      particles: [],
+      pickups: [],
+      interactables: [],
+      obstacles: [],
+      pendingSpawns: 0,
+      spawnTimer: 0,
+      shake: 0,
+      bannerTimer: 0,
+      message: "",
+      messageTimer: 0
+    };
+  }
+
+  function createWeapon(baseId, qualityId) {
+    const base = weaponBases[baseId];
+    const quality = qualities[qualityId];
+    const mag = Math.max(1, Math.round(base.mag * quality.mag));
+    return {
+      baseId, qualityId, name: base.name, short: base.short, color: base.color,
+      damage: Math.round(base.damage * quality.mult * 10) / 10,
+      delay: base.delay / (qualityId === "legendary" ? 1.12 : 1),
+      mag, ammo: mag, reserve: mag * 6, reload: base.reload,
+      speed: base.speed, pellets: base.pellets, spread: base.spread,
+      pierce: base.pierce + (qualityId === "legendary" && base.pierce === 0 ? 1 : 0),
+      explosive: base.explosive + (qualityId === "legendary" && baseId !== "launcher" ? 32 : 0)
+    };
+  }
+
+  function startGame() {
+    state = makeState();
+    ui.startScreen.hidden = true;
+    ui.gameOverScreen.hidden = true;
+    ui.pauseScreen.hidden = true;
+    ui.upgradeScreen.hidden = true;
+    ui.gameHud.hidden = false;
+    ui.touchControls.hidden = !isTouchDevice();
+    ui.skillName.textContent = characters[selectedCharacter].skill;
+    startRoom();
+    lastTime = performance.now();
+    cancelAnimationFrame(animationId);
+    animationId = requestAnimationFrame(loop);
+  }
+
+  function startRoom() {
+    const s = state;
+    s.roomState = "combat";
+    s.enemies = [];
+    s.bullets = [];
+    s.enemyBullets = [];
+    s.pickups = [];
+    s.interactables = [];
+    s.particles = [];
+    s.player.x = 105;
+    s.player.y = H / 2;
+    s.player.reloading = 0;
+    s.obstacles = buildRoomLayout(s.room);
+    s.pendingSpawns = s.room === 5 ? Math.min(3 + s.floor, 8) : 3 + s.floor + s.room * 2;
+    s.spawnTimer = .25;
+    if (s.room === 5) spawnEnemy("boss", W - 190, H / 2);
+    showBanner(`Floor ${s.floor} / ${roomNames[s.room - 1]}`);
+    updateHud();
+  }
+
+  function buildRoomLayout(room) {
+    const layouts = [
+      [{ x: 390, y: 175, w: 70, h: 125 }, { x: 390, y: 380, w: 70, h: 125 }, { x: 700, y: 270, w: 80, h: 140 }],
+      [{ x: 305, y: 250, w: 140, h: 70 }, { x: 650, y: 160, w: 80, h: 120 }, { x: 650, y: 400, w: 80, h: 120 }],
+      [{ x: 300, y: 140, w: 78, h: 155 }, { x: 520, y: 385, w: 78, h: 155 }, { x: 755, y: 140, w: 78, h: 155 }],
+      [{ x: 335, y: 285, w: 100, h: 100 }, { x: 665, y: 285, w: 100, h: 100 }, { x: 500, y: 120, w: 100, h: 75 }],
+      [{ x: 285, y: 175, w: 65, h: 115 }, { x: 285, y: 390, w: 65, h: 115 }, { x: 750, y: 175, w: 65, h: 115 }, { x: 750, y: 390, w: 65, h: 115 }]
+    ];
+    return layouts[(room - 1) % layouts.length].map(o => ({ ...o }));
+  }
+
+  function loop(now) {
+    if (!state || !state.running) return;
+    const dt = Math.min((now - lastTime) / 1000, .034);
+    lastTime = now;
+    if (!state.paused && !state.choosingTalent && !state.gameOver) update(dt);
+    draw();
+    animationId = requestAnimationFrame(loop);
+  }
+
+  function update(dt) {
+    updatePlayer(dt);
+    updateSpawning(dt);
+    updateEnemies(dt);
+    updateBullets(dt);
+    updateEnemyBullets(dt);
+    updatePickups(dt);
+    updateParticles(dt);
+    updateInteraction();
+
+    if (state.roomState === "combat" && state.pendingSpawns <= 0 && state.enemies.length === 0) {
+      clearRoom();
     }
-];
 
-let game = {};
-let animationFrame = 0;
-let lastTime = 0;
-let selectedCharacter = "analyst";
-let audioEnabled = true;
-let audioContext = null;
-let enemyId = 0;
-const keys = {};
-const pointer = { x: canvas.width * 0.7, y: canvas.height * 0.5, down: false };
+    state.shake = Math.max(0, state.shake - dt * 22);
+    state.bannerTimer = Math.max(0, state.bannerTimer - dt);
+    state.messageTimer = Math.max(0, state.messageTimer - dt);
+    ui.roomBanner.hidden = state.bannerTimer <= 0;
+    updateHud();
+  }
 
-document.querySelectorAll(".character-card").forEach((card) => {
-    card.addEventListener("click", () => {
-        selectedCharacter = card.dataset.character;
-        document.querySelectorAll(".character-card").forEach((item) => item.classList.toggle("selected", item === card));
+  function updatePlayer(dt) {
+    const p = state.player;
+    p.invulnerable = Math.max(0, p.invulnerable - dt);
+    p.dashCooldown = Math.max(0, p.dashCooldown - dt);
+    p.skillCooldown = Math.max(0, p.skillCooldown - dt);
+    p.fireCooldown = Math.max(0, p.fireCooldown - dt);
+
+    let dx = (keys.KeyD || keys.ArrowRight || touchKeys.right ? 1 : 0) - (keys.KeyA || keys.ArrowLeft || touchKeys.left ? 1 : 0);
+    let dy = (keys.KeyS || keys.ArrowDown || touchKeys.down ? 1 : 0) - (keys.KeyW || keys.ArrowUp || touchKeys.up ? 1 : 0);
+    const length = Math.hypot(dx, dy) || 1;
+    dx /= length;
+    dy /= length;
+
+    if (p.dashTime > 0) {
+      p.dashTime -= dt;
+      moveCircle(p, p.dashX * 660 * dt, p.dashY * 660 * dt);
+      addParticle(p.x, p.y, p.color, 2, 22);
+    } else {
+      moveCircle(p, dx * p.speed * state.speedMult * dt, dy * p.speed * state.speedMult * dt);
+    }
+
+    const autoTarget = !pointer.inside ? nearestEnemy(p.x, p.y) : null;
+    const aimX = autoTarget ? autoTarget.x : pointer.x;
+    const aimY = autoTarget ? autoTarget.y : pointer.y;
+    p.angle = Math.atan2(aimY - p.y, aimX - p.x);
+
+    if ((pointer.down || keys.Space) && !p.reloading) fireWeapon();
+
+    if (p.reloading > 0) {
+      p.reloading -= dt;
+      if (p.reloading <= 0) finishReload();
+    }
+  }
+
+  function updateSpawning(dt) {
+    if (state.roomState !== "combat" || state.pendingSpawns <= 0) return;
+    state.spawnTimer -= dt;
+    if (state.spawnTimer > 0) return;
+    const cap = 4 + Math.min(state.floor, 3);
+    if (state.enemies.length >= cap) {
+      state.spawnTimer = .25;
+      return;
+    }
+    spawnEnemy(chooseEnemyType());
+    state.pendingSpawns--;
+    state.spawnTimer = Math.max(.28, .7 - state.floor * .025);
+  }
+
+  function chooseEnemyType() {
+    const r = Math.random();
+    if (state.floor >= 3 && r < .13) return "shield";
+    if (state.floor >= 2 && r < .28) return "replicator";
+    if (r < .47) return "reviewer";
+    if (r < .68) return "deadline";
+    return "bug";
+  }
+
+  function spawnEnemy(typeId, forcedX, forcedY, miniature = false) {
+    const type = enemyTypes[typeId];
+    let x = forcedX;
+    let y = forcedY;
+    if (x === undefined) {
+      const edge = Math.random();
+      if (edge < .5) {
+        x = W - 85;
+        y = 85 + Math.random() * (H - 170);
+      } else {
+        x = 180 + Math.random() * (W - 280);
+        y = edge < .75 ? 75 : H - 75;
+      }
+    }
+    const floorScale = 1 + (state.floor - 1) * .19 + (state.room - 1) * .035;
+    const sizeScale = miniature ? .65 : 1;
+    const hp = type.hp * floorScale * (miniature ? .42 : 1);
+    state.enemies.push({
+      typeId, x, y, radius: type.radius * sizeScale, color: type.color,
+      hp, maxHp: hp, speed: type.speed * (1 + (state.floor - 1) * .045),
+      damage: type.damage * (1 + (state.floor - 1) * .12),
+      score: Math.round(type.score * floorScale), armor: type.armor || 0,
+      ranged: type.ranged, boss: type.boss, split: type.split && !miniature,
+      attackCooldown: .4 + Math.random(), shootCooldown: .7 + Math.random(),
+      summonCooldown: 6, frozen: 0, flash: 0, miniature
     });
-});
+  }
 
-ui.startButton.addEventListener("click", startGame);
-ui.restartButton.addEventListener("click", startGame);
-ui.changeCharacter.addEventListener("click", showCharacterSelect);
-ui.pauseButton.addEventListener("click", togglePause);
-ui.resumeButton.addEventListener("click", togglePause);
-ui.fullscreenButton.addEventListener("click", toggleFullscreen);
-ui.soundButton.addEventListener("click", () => {
-    audioEnabled = !audioEnabled;
-    ui.soundButton.textContent = `Sound: ${audioEnabled ? "On" : "Off"}`;
-});
+  function updateEnemies(dt) {
+    const p = state.player;
+    state.enemies.forEach(e => {
+      e.flash = Math.max(0, e.flash - dt);
+      e.frozen = Math.max(0, e.frozen - dt);
+      e.attackCooldown -= dt;
+      e.shootCooldown -= dt;
+      e.summonCooldown -= dt;
+      if (e.frozen > 0) return;
 
-window.addEventListener("keydown", (event) => {
-    const key = event.key.toLowerCase();
-    keys[key] = true;
-    if ([" ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) event.preventDefault();
+      const dist = distance(e, p);
+      let desired = e.ranged ? 260 : e.radius + p.radius + 7;
+      let vx = 0;
+      let vy = 0;
+      if (dist > desired + 18) {
+        vx = (p.x - e.x) / Math.max(dist, 1);
+        vy = (p.y - e.y) / Math.max(dist, 1);
+      } else if (e.ranged && dist < desired - 55) {
+        vx = (e.x - p.x) / Math.max(dist, 1);
+        vy = (e.y - p.y) / Math.max(dist, 1);
+      }
+      const strafe = e.ranged ? Math.sin(performance.now() * .0015 + e.x) * .32 : 0;
+      moveCircle(e, (vx - vy * strafe) * e.speed * dt, (vy + vx * strafe) * e.speed * dt);
 
-    if (game.upgrading && ["1", "2", "3"].includes(event.key)) {
-        chooseUpgrade(Number(event.key) - 1);
-        return;
+      if (dist < e.radius + p.radius + 4 && e.attackCooldown <= 0) {
+        damagePlayer(e.damage);
+        e.attackCooldown = e.boss ? .7 : 1;
+        const knock = 18;
+        moveCircle(p, (p.x - e.x) / Math.max(dist, 1) * knock, (p.y - e.y) / Math.max(dist, 1) * knock);
+      }
+
+      if (e.ranged && e.shootCooldown <= 0 && dist < 520) {
+        shootEnemy(e);
+        e.shootCooldown = e.boss ? .82 : 1.65 + Math.random() * .45;
+      }
+      if (e.boss && e.summonCooldown <= 0 && state.enemies.length < 8) {
+        spawnEnemy(Math.random() < .5 ? "deadline" : "bug", e.x + random(-70, 70), e.y + random(-70, 70), true);
+        spawnEnemy("bug", e.x + random(-70, 70), e.y + random(-70, 70), true);
+        e.summonCooldown = 5.5;
+        showMessage("The committee requested more reviewers.");
+      }
+    });
+  }
+
+  function shootEnemy(e) {
+    const angle = Math.atan2(state.player.y - e.y, state.player.x - e.x);
+    const count = e.boss ? 5 : 1;
+    for (let i = 0; i < count; i++) {
+      const spread = e.boss ? (i - 2) * .16 : 0;
+      state.enemyBullets.push({
+        x: e.x, y: e.y, vx: Math.cos(angle + spread) * (e.boss ? 285 : 245),
+        vy: Math.sin(angle + spread) * (e.boss ? 285 : 245),
+        radius: e.boss ? 7 : 5, damage: e.damage * .75, life: 4, color: e.color
+      });
     }
-    if (event.repeat) return;
-    if (key === "p" || event.key === "Escape") togglePause();
-    if (key === "e") activateSkill();
-    if (event.key === "Shift") dash();
-});
-window.addEventListener("keyup", (event) => {
-    keys[event.key.toLowerCase()] = false;
-});
+  }
 
-canvas.addEventListener("pointermove", updatePointer);
-canvas.addEventListener("pointerdown", (event) => {
-    updatePointer(event);
-    pointer.down = true;
-    canvas.setPointerCapture?.(event.pointerId);
-});
-canvas.addEventListener("pointerup", () => { pointer.down = false; });
-canvas.addEventListener("pointerleave", () => { pointer.down = false; });
+  function fireWeapon() {
+    const p = state.player;
+    const weapon = activeWeapon();
+    if (!weapon || p.fireCooldown > 0 || p.reloading > 0) return;
+    if (weapon.ammo <= 0) {
+      startReload();
+      return;
+    }
+    weapon.ammo--;
+    p.fireCooldown = weapon.delay;
+    const quality = qualities[weapon.qualityId];
+    for (let i = 0; i < weapon.pellets; i++) {
+      const offset = weapon.pellets === 1 ? random(-weapon.spread, weapon.spread) : (i / (weapon.pellets - 1) - .5) * weapon.spread + random(-.025, .025);
+      const angle = p.angle + offset;
+      state.bullets.push({
+        x: p.x + Math.cos(angle) * 25, y: p.y + Math.sin(angle) * 25,
+        vx: Math.cos(angle) * weapon.speed, vy: Math.sin(angle) * weapon.speed,
+        radius: weapon.baseId === "launcher" ? 7 : weapon.baseId === "railgun" ? 4 : 3.5,
+        damage: weapon.damage * state.damageMult, life: 1.7, pierce: weapon.pierce,
+        explosive: weapon.explosive, color: quality.color, hit: new Set()
+      });
+    }
+    state.shake = Math.min(5, state.shake + (weapon.pellets > 1 || weapon.explosive ? 2.2 : .5));
+    addParticle(p.x + Math.cos(p.angle) * 25, p.y + Math.sin(p.angle) * 25, quality.color, 4, 50);
+    if (weapon.ammo <= 0) setTimeout(() => { if (state && state.player.reloading <= 0) startReload(); }, 120);
+  }
 
-document.querySelectorAll("[data-key]").forEach((button) => {
-    const key = button.dataset.key.toLowerCase();
-    const on = (event) => { event.preventDefault(); keys[key] = true; };
-    const off = (event) => { event.preventDefault(); keys[key] = false; };
+  function updateBullets(dt) {
+    for (let i = state.bullets.length - 1; i >= 0; i--) {
+      const b = state.bullets[i];
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+      b.life -= dt;
+      let remove = b.life <= 0 || b.x < 35 || b.x > W - 35 || b.y < 35 || b.y > H - 35 || circleHitsObstacle(b);
+      for (let j = state.enemies.length - 1; j >= 0 && !remove; j--) {
+        const e = state.enemies[j];
+        if (b.hit.has(e) || distance(b, e) > b.radius + e.radius) continue;
+        b.hit.add(e);
+        hitEnemy(e, b.damage);
+        if (b.explosive) {
+          explode(b.x, b.y, b.explosive, b.damage * .72, b.color, e);
+          remove = true;
+        } else if (b.pierce > 0) {
+          b.pierce--;
+          b.damage *= .84;
+        } else {
+          remove = true;
+        }
+      }
+      if (remove) state.bullets.splice(i, 1);
+    }
+  }
+
+  function updateEnemyBullets(dt) {
+    for (let i = state.enemyBullets.length - 1; i >= 0; i--) {
+      const b = state.enemyBullets[i];
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+      b.life -= dt;
+      if (distance(b, state.player) < b.radius + state.player.radius) {
+        damagePlayer(b.damage);
+        state.enemyBullets.splice(i, 1);
+      } else if (b.life <= 0 || b.x < 30 || b.x > W - 30 || b.y < 30 || b.y > H - 30 || circleHitsObstacle(b)) {
+        state.enemyBullets.splice(i, 1);
+      }
+    }
+  }
+
+  function hitEnemy(enemy, damage) {
+    const effective = damage * (1 - enemy.armor);
+    enemy.hp -= effective;
+    enemy.flash = .09;
+    addParticle(enemy.x, enemy.y, enemy.color, 3, 45);
+    if (enemy.hp > 0) return;
+    const index = state.enemies.indexOf(enemy);
+    if (index < 0) return;
+    state.enemies.splice(index, 1);
+    state.score += enemy.score;
+    state.coins += enemy.boss ? 20 : 1 + (Math.random() < .18 ? 1 : 0);
+    addParticle(enemy.x, enemy.y, enemy.color, enemy.boss ? 30 : 10, enemy.boss ? 150 : 95);
+    if (enemy.split) {
+      spawnEnemy("bug", enemy.x - 16, enemy.y, true);
+      spawnEnemy("bug", enemy.x + 16, enemy.y, true);
+    }
+    if (!enemy.boss) maybeDrop(enemy.x, enemy.y);
+    state.shake = enemy.boss ? 12 : 3;
+  }
+
+  function explode(x, y, radius, damage, color, ignored) {
+    addParticle(x, y, color, 18, radius * 1.8);
+    state.enemies.slice().forEach(e => {
+      if (e !== ignored && distance({ x, y }, e) < radius + e.radius) {
+        const falloff = 1 - Math.min(.55, distance({ x, y }, e) / (radius * 2));
+        hitEnemy(e, damage * falloff);
+      }
+    });
+    state.shake = 8;
+  }
+
+  function maybeDrop(x, y) {
+    const r = Math.random();
+    if (r < .08) state.pickups.push({ type: "health", x, y, radius: 10, amount: 18, pulse: 0 });
+    else if (r < .22) state.pickups.push({ type: "ammo", x, y, radius: 10, amount: .32, pulse: 0 });
+    else if (r < .36) state.pickups.push({ type: "coin", x, y, radius: 8, amount: 3, pulse: 0 });
+  }
+
+  function updatePickups(dt) {
+    for (let i = state.pickups.length - 1; i >= 0; i--) {
+      const item = state.pickups[i];
+      item.pulse += dt;
+      if (item.type === "weapon") continue;
+      if (distance(item, state.player) > item.radius + state.player.radius + 5) continue;
+      if (item.type === "health") {
+        if (state.health >= state.maxHealth) continue;
+        state.health = Math.min(state.maxHealth, state.health + item.amount);
+        showMessage(`Integrity +${item.amount}`);
+      } else if (item.type === "ammo") {
+        state.inventory.filter(Boolean).forEach(w => { w.reserve += Math.ceil(w.mag * item.amount); });
+        showMessage("Citation ammo restored");
+      } else {
+        state.coins += item.amount;
+        state.score += item.amount * 8;
+      }
+      addParticle(item.x, item.y, pickupColor(item.type), 8, 75);
+      state.pickups.splice(i, 1);
+    }
+  }
+
+  function clearRoom() {
+    state.roomState = "cleared";
+    state.clearedRooms++;
+    state.score += 120 * state.floor * state.room;
+    state.enemyBullets = [];
+    const chestQuality = state.room === 5 ? "boss" : "normal";
+    state.interactables.push({ type: "chest", x: W / 2, y: H / 2, radius: 28, opened: false, tier: chestQuality });
+    state.interactables.push({ type: "portal", x: W - 78, y: H / 2, radius: 30 });
+    showBanner(state.room === 5 ? "Committee Defeated" : "Room Cleared");
+    showMessage("Open the evidence chest, then use the portal.");
+  }
+
+  function updateInteraction() {
+    const target = nearestInteractable();
+    if (!target) {
+      ui.prompt.hidden = true;
+      return;
+    }
+    ui.prompt.hidden = false;
+    if (target.type === "chest") ui.prompt.textContent = "F  Open evidence chest";
+    if (target.type === "portal") ui.prompt.textContent = state.room === 5 ? "F  Complete floor" : "F  Enter next room";
+    if (target.type === "weapon") {
+      const q = qualities[target.weapon.qualityId];
+      ui.prompt.textContent = `F  Pick up ${q.name} ${target.weapon.name}`;
+    }
+  }
+
+  function interact() {
+    if (!state || state.paused || state.choosingTalent || state.gameOver) return;
+    const target = nearestInteractable();
+    if (!target) return;
+    if (target.type === "chest") openChest(target);
+    else if (target.type === "weapon") collectWeapon(target);
+    else if (target.type === "portal") {
+      if (state.room < 5) {
+        state.room++;
+        startRoom();
+      } else {
+        openTalentChoice();
+      }
+    }
+  }
+
+  function nearestInteractable() {
+    if (!state) return null;
+    const candidates = [
+      ...state.interactables.filter(i => !i.opened),
+      ...state.pickups.filter(i => i.type === "weapon")
+    ];
+    let nearest = null;
+    let best = 74;
+    candidates.forEach(item => {
+      const d = distance(item, state.player);
+      if (d < best) {
+        best = d;
+        nearest = item;
+      }
+    });
+    return nearest;
+  }
+
+  function openChest(chest) {
+    chest.opened = true;
+    const qualityId = rollQuality(chest.tier === "boss");
+    const ids = Object.keys(weaponBases);
+    let baseId = ids[Math.floor(Math.random() * ids.length)];
+    const current = activeWeapon();
+    if (ids.length > 1 && current && baseId === current.baseId) baseId = ids[(ids.indexOf(baseId) + 1 + Math.floor(Math.random() * (ids.length - 1))) % ids.length];
+    const weapon = createWeapon(baseId, qualityId);
+    weapon.reserve = Math.round(weapon.reserve * state.ammoMult);
+    state.pickups.push({ type: "weapon", x: chest.x, y: chest.y + 48, radius: 18, weapon, pulse: 0 });
+    state.pickups.push({ type: "ammo", x: chest.x - 42, y: chest.y + 22, radius: 10, amount: .42, pulse: 0 });
+    if (Math.random() < .5 || chest.tier === "boss") state.pickups.push({ type: "health", x: chest.x + 42, y: chest.y + 22, radius: 10, amount: 22, pulse: 0 });
+    showMessage(`${qualities[qualityId].name} evidence discovered.`);
+    addParticle(chest.x, chest.y, qualities[qualityId].color, 24, 125);
+  }
+
+  function collectWeapon(item) {
+    const empty = state.inventory.findIndex(w => !w);
+    if (empty >= 0) {
+      state.inventory[empty] = item.weapon;
+      state.activeSlot = empty;
+      showMessage(`${item.weapon.name} added to slot ${empty + 1}.`);
+    } else {
+      const old = state.inventory[state.activeSlot];
+      state.inventory[state.activeSlot] = item.weapon;
+      item.weapon = old;
+      item.x += 48;
+      showMessage(`Replaced ${old.name}. Press F again to swap back.`);
+      state.player.reloading = 0;
+      updateHud();
+      return;
+    }
+    state.pickups.splice(state.pickups.indexOf(item), 1);
+    state.player.reloading = 0;
+    updateHud();
+  }
+
+  function rollQuality(bossChest = false) {
+    const boost = Math.min(.34, (state.floor - 1) * .035 + state.luck + (bossChest ? .18 : 0));
+    const r = Math.random();
+    if (r < .02 + boost * .18) return "legendary";
+    if (r < .09 + boost * .46) return "epic";
+    if (r < .27 + boost * .72) return "rare";
+    if (r < .61 + boost) return "uncommon";
+    return "common";
+  }
+
+  function switchWeapon(slot) {
+    if (!state || !state.inventory[slot] || slot === state.activeSlot) return;
+    state.activeSlot = slot;
+    state.player.reloading = 0;
+    state.player.fireCooldown = Math.min(state.player.fireCooldown, .12);
+    showMessage(state.inventory[slot].name);
+    updateHud();
+  }
+
+  function cycleWeapon() {
+    if (!state) return;
+    const other = state.activeSlot === 0 ? 1 : 0;
+    if (state.inventory[other]) switchWeapon(other);
+  }
+
+  function activeWeapon() {
+    return state ? state.inventory[state.activeSlot] : null;
+  }
+
+  function startReload() {
+    if (!state) return;
+    const w = activeWeapon();
+    if (!w || state.player.reloading > 0 || w.ammo >= w.mag || w.reserve <= 0) return;
+    state.player.reloading = w.reload * state.reloadMult;
+  }
+
+  function finishReload() {
+    const w = activeWeapon();
+    if (!w) return;
+    const amount = Math.min(w.mag - w.ammo, w.reserve);
+    w.ammo += amount;
+    w.reserve -= amount;
+    state.player.reloading = 0;
+  }
+
+  function useDash() {
+    if (!state || state.player.dashCooldown > 0 || state.paused || state.choosingTalent) return;
+    let dx = (keys.KeyD || keys.ArrowRight || touchKeys.right ? 1 : 0) - (keys.KeyA || keys.ArrowLeft || touchKeys.left ? 1 : 0);
+    let dy = (keys.KeyS || keys.ArrowDown || touchKeys.down ? 1 : 0) - (keys.KeyW || keys.ArrowUp || touchKeys.up ? 1 : 0);
+    if (!dx && !dy) {
+      dx = Math.cos(state.player.angle);
+      dy = Math.sin(state.player.angle);
+    }
+    const len = Math.hypot(dx, dy) || 1;
+    state.player.dashX = dx / len;
+    state.player.dashY = dy / len;
+    state.player.dashTime = .18;
+    state.player.dashCooldown = 2.15;
+    state.player.invulnerable = .28;
+  }
+
+  function useSkill() {
+    if (!state || state.player.skillCooldown > 0 || state.paused || state.choosingTalent) return;
+    const p = state.player;
+    const c = characters[selectedCharacter];
+    p.skillCooldown = c.skillCooldown * state.skillMult;
+    if (selectedCharacter === "analyst") {
+      state.enemies.forEach(e => {
+        if (distance(e, p) < 430) e.frozen = e.boss ? 2 : 4.2;
+      });
+      showMessage("Data Freeze: nearby threats suspended.");
+      addParticle(p.x, p.y, "#78c8ff", 32, 190);
+    } else if (selectedCharacter === "hacker") {
+      state.enemies.slice().forEach(e => {
+        if (distance(e, p) < 260) hitEnemy(e, 48 * state.damageMult);
+      });
+      state.enemyBullets = state.enemyBullets.filter(b => distance(b, p) > 285);
+      showMessage("EMP Pulse: threats disrupted.");
+      addParticle(p.x, p.y, "#4fe1a3", 36, 220);
+    } else {
+      for (let i = 0; i < 18; i++) {
+        const a = i / 18 * Math.PI * 2;
+        state.bullets.push({
+          x: p.x, y: p.y, vx: Math.cos(a) * 520, vy: Math.sin(a) * 520,
+          radius: 4, damage: 27 * state.damageMult, life: 1.2, pierce: 1,
+          explosive: 0, color: "#cb98ff", hit: new Set()
+        });
+      }
+      showMessage("Citation Storm: arguments everywhere.");
+    }
+  }
+
+  function openTalentChoice() {
+    state.choosingTalent = true;
+    ui.upgradeGrid.innerHTML = "";
+    const options = shuffled(talents).slice(0, 3);
+    options.forEach(talent => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "upgrade-card";
+      button.innerHTML = `<span class="upgrade-icon">${talent.icon}</span><strong>${talent.name}</strong><p>${talent.text}</p>`;
+      button.addEventListener("click", () => {
+        talent.apply(state);
+        state.floor++;
+        state.room = 1;
+        state.choosingTalent = false;
+        ui.upgradeScreen.hidden = true;
+        startRoom();
+      }, { once: true });
+      ui.upgradeGrid.appendChild(button);
+    });
+    ui.upgradeScreen.hidden = false;
+  }
+
+  function damagePlayer(amount) {
+    const p = state.player;
+    if (p.invulnerable > 0) return;
+    const actual = Math.max(1, Math.round(amount * (1 - state.armor)));
+    state.health -= actual;
+    p.invulnerable = .62;
+    state.shake = 9;
+    addParticle(p.x, p.y, "#ff657c", 12, 100);
+    if (state.health <= 0) endGame();
+  }
+
+  function endGame() {
+    state.health = 0;
+    state.gameOver = true;
+    const best = Math.max(Number(localStorage.getItem("thesisDungeonBest") || 0), Math.round(state.score));
+    localStorage.setItem("thesisDungeonBest", String(best));
+    ui.finalScore.textContent = Math.round(state.score).toLocaleString();
+    ui.finalWave.textContent = String(state.clearedRooms);
+    ui.bestScore.textContent = best.toLocaleString();
+    ui.gameOverMessage.textContent = state.floor >= 3
+      ? "A strong run. The committee recommends a focused revision."
+      : "Rebuild the loadout, compare weapon qualities, and try a new researcher.";
+    ui.gameOverScreen.hidden = false;
+    ui.touchControls.hidden = true;
+  }
+
+  function moveCircle(entity, dx, dy) {
+    entity.x += dx;
+    if (circleHitsObstacle(entity)) entity.x -= dx;
+    entity.y += dy;
+    if (circleHitsObstacle(entity)) entity.y -= dy;
+    entity.x = clamp(entity.x, 48 + entity.radius, W - 48 - entity.radius);
+    entity.y = clamp(entity.y, 58 + entity.radius, H - 48 - entity.radius);
+  }
+
+  function circleHitsObstacle(circle) {
+    return state.obstacles.some(o => {
+      const x = clamp(circle.x, o.x, o.x + o.w);
+      const y = clamp(circle.y, o.y, o.y + o.h);
+      return Math.hypot(circle.x - x, circle.y - y) < circle.radius;
+    });
+  }
+
+  function draw() {
+    if (!state) {
+      drawBackdrop();
+      return;
+    }
+    ctx.save();
+    if (state.shake > 0) ctx.translate(random(-state.shake, state.shake), random(-state.shake, state.shake));
+    drawRoom();
+    drawInteractables();
+    drawPickups();
+    drawParticles();
+    state.bullets.forEach(drawBullet);
+    state.enemyBullets.forEach(drawEnemyBullet);
+    state.enemies.forEach(drawEnemy);
+    drawPlayer();
+    drawBossBar();
+    if (state.messageTimer > 0) drawMessage();
+    ctx.restore();
+  }
+
+  function drawBackdrop() {
+    const gradient = ctx.createLinearGradient(0, 0, W, H);
+    gradient.addColorStop(0, "#131a2d");
+    gradient.addColorStop(1, "#1c1830");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "rgba(255,255,255,.025)";
+    for (let x = 0; x < W; x += 42) for (let y = 0; y < H; y += 42) ctx.fillRect(x, y, 2, 2);
+  }
+
+  function drawRoom() {
+    const hue = 224 + (state.floor % 4) * 8;
+    const gradient = ctx.createRadialGradient(W / 2, H / 2, 80, W / 2, H / 2, W * .65);
+    gradient.addColorStop(0, `hsl(${hue} 30% 20%)`);
+    gradient.addColorStop(1, `hsl(${hue} 35% 10%)`);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = "rgba(255,255,255,.035)";
+    ctx.lineWidth = 1;
+    for (let x = 48; x < W - 48; x += 42) {
+      ctx.beginPath(); ctx.moveTo(x, 58); ctx.lineTo(x, H - 48); ctx.stroke();
+    }
+    for (let y = 58; y < H - 48; y += 42) {
+      ctx.beginPath(); ctx.moveTo(48, y); ctx.lineTo(W - 48, y); ctx.stroke();
+    }
+    ctx.strokeStyle = "rgba(183,168,255,.2)";
+    ctx.lineWidth = 5;
+    roundRect(45, 55, W - 90, H - 100, 20);
+    ctx.stroke();
+
+    state.obstacles.forEach(o => {
+      ctx.fillStyle = "#222b43";
+      ctx.strokeStyle = "rgba(153,175,221,.25)";
+      ctx.lineWidth = 3;
+      roundRect(o.x, o.y, o.w, o.h, 12);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "rgba(255,255,255,.045)";
+      roundRect(o.x + 9, o.y + 9, o.w - 18, 13, 5);
+      ctx.fill();
+      ctx.fillStyle = "rgba(122,144,194,.16)";
+      for (let y = o.y + 34; y < o.y + o.h - 8; y += 20) ctx.fillRect(o.x + 10, y, o.w - 20, 4);
+    });
+  }
+
+  function drawInteractables() {
+    state.interactables.forEach(item => {
+      if (item.type === "chest") {
+        if (item.opened) {
+          ctx.fillStyle = "#423d4f";
+          roundRect(item.x - 27, item.y - 10, 54, 25, 7); ctx.fill();
+          return;
+        }
+        const glow = item.tier === "boss" ? "#ff9d3b" : "#b278ff";
+        ctx.save();
+        ctx.shadowColor = glow; ctx.shadowBlur = 22;
+        ctx.fillStyle = "#493d63";
+        roundRect(item.x - 30, item.y - 20, 60, 42, 8); ctx.fill();
+        ctx.fillStyle = glow; ctx.fillRect(item.x - 4, item.y - 20, 8, 42);
+        ctx.strokeStyle = "#e9dcff"; ctx.lineWidth = 2;
+        roundRect(item.x - 30, item.y - 20, 60, 42, 8); ctx.stroke();
+        ctx.restore();
+      } else {
+        const pulse = 1 + Math.sin(performance.now() * .005) * .08;
+        ctx.save();
+        ctx.translate(item.x, item.y);
+        ctx.scale(pulse, pulse);
+        ctx.strokeStyle = "#77d8ff"; ctx.lineWidth = 5;
+        ctx.shadowColor = "#77d8ff"; ctx.shadowBlur = 22;
+        ctx.beginPath(); ctx.ellipse(0, 0, 22, 38, 0, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = "rgba(157,120,255,.65)"; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.ellipse(0, 0, 33, 48, 0, 0, Math.PI * 2); ctx.stroke();
+        ctx.restore();
+      }
+    });
+  }
+
+  function drawPickups() {
+    state.pickups.forEach(item => {
+      const bob = Math.sin(item.pulse * 4) * 4;
+      if (item.type === "weapon") {
+        const q = qualities[item.weapon.qualityId];
+        ctx.save();
+        ctx.translate(item.x, item.y + bob);
+        ctx.shadowColor = q.color; ctx.shadowBlur = 25;
+        ctx.fillStyle = "rgba(17,22,37,.86)";
+        roundRect(-34, -17, 68, 34, 10); ctx.fill();
+        ctx.fillStyle = q.color;
+        roundRect(-24, -5, 40, 10, 4); ctx.fill();
+        ctx.fillRect(9, 4, 9, 10);
+        ctx.fillStyle = "#fff"; ctx.font = "800 9px DM Sans"; ctx.textAlign = "center";
+        ctx.fillText(q.label, 25, -7);
+        ctx.restore();
+      } else {
+        ctx.save();
+        ctx.translate(item.x, item.y + bob);
+        const color = pickupColor(item.type);
+        ctx.shadowColor = color; ctx.shadowBlur = 15; ctx.fillStyle = color;
+        if (item.type === "health") {
+          ctx.fillRect(-4, -10, 8, 20); ctx.fillRect(-10, -4, 20, 8);
+        } else if (item.type === "ammo") {
+          roundRect(-7, -11, 14, 22, 4); ctx.fill();
+        } else {
+          ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = "#664b12"; ctx.font = "800 9px sans-serif"; ctx.textAlign = "center"; ctx.fillText("$", 0, 3);
+        }
+        ctx.restore();
+      }
+    });
+  }
+
+  function drawPlayer() {
+    const p = state.player;
+    const weapon = activeWeapon();
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    if (p.invulnerable > 0 && Math.floor(p.invulnerable * 18) % 2 === 0) ctx.globalAlpha = .38;
+    ctx.shadowColor = p.color; ctx.shadowBlur = 18;
+    ctx.fillStyle = p.color;
+    ctx.beginPath(); ctx.arc(0, 0, p.radius, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = "#182036";
+    ctx.beginPath(); ctx.arc(0, 0, p.radius * .52, 0, Math.PI * 2); ctx.fill();
+    ctx.rotate(p.angle);
+    ctx.fillStyle = weapon ? qualities[weapon.qualityId].color : "#fff";
+    roundRect(10, -5, 29, 10, 4); ctx.fill();
+    ctx.fillStyle = "#222a3d"; ctx.fillRect(18, 4, 8, 9);
+    ctx.restore();
+  }
+
+  function drawEnemy(e) {
+    ctx.save();
+    ctx.translate(e.x, e.y);
+    ctx.shadowColor = e.color;
+    ctx.shadowBlur = e.boss ? 24 : 12;
+    ctx.fillStyle = e.flash > 0 ? "#fff" : e.frozen > 0 ? "#7bd7ff" : e.color;
+    if (e.typeId === "deadline") {
+      ctx.rotate(Math.PI / 4); ctx.fillRect(-e.radius * .75, -e.radius * .75, e.radius * 1.5, e.radius * 1.5);
+    } else if (e.typeId === "reviewer") {
+      polygon(0, 0, e.radius, 6); ctx.fill();
+    } else if (e.typeId === "shield") {
+      polygon(0, 0, e.radius, 8); ctx.fill();
+      ctx.strokeStyle = "#b9e7ff"; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0, 0, e.radius + 5, -.9, .9); ctx.stroke();
+    } else if (e.typeId === "replicator") {
+      ctx.beginPath(); ctx.arc(-6, 0, e.radius * .72, 0, Math.PI * 2); ctx.arc(7, 0, e.radius * .72, 0, Math.PI * 2); ctx.fill();
+    } else {
+      ctx.beginPath(); ctx.arc(0, 0, e.radius, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = "#20243a";
+    ctx.beginPath(); ctx.arc(-e.radius * .28, -2, 2.5, 0, Math.PI * 2); ctx.arc(e.radius * .28, -2, 2.5, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    if (!e.boss && e.hp < e.maxHp) {
+      ctx.fillStyle = "rgba(0,0,0,.45)"; ctx.fillRect(e.x - e.radius, e.y - e.radius - 11, e.radius * 2, 4);
+      ctx.fillStyle = e.color; ctx.fillRect(e.x - e.radius, e.y - e.radius - 11, e.radius * 2 * Math.max(0, e.hp / e.maxHp), 4);
+    }
+  }
+
+  function drawBullet(b) {
+    ctx.save();
+    ctx.shadowColor = b.color; ctx.shadowBlur = 12; ctx.fillStyle = b.color;
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawEnemyBullet(b) {
+    ctx.save();
+    ctx.shadowColor = b.color; ctx.shadowBlur = 14; ctx.fillStyle = b.color;
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "#fff"; ctx.globalAlpha = .4; ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawBossBar() {
+    const boss = state.enemies.find(e => e.boss);
+    if (!boss) return;
+    const width = 420;
+    const x = W / 2 - width / 2;
+    ctx.fillStyle = "rgba(7,10,20,.78)";
+    roundRect(x - 12, 88, width + 24, 42, 13); ctx.fill();
+    ctx.fillStyle = "#e9e6f3"; ctx.font = "800 11px DM Sans"; ctx.textAlign = "center";
+    ctx.fillText("FINAL COMMITTEE", W / 2, 104);
+    ctx.fillStyle = "rgba(255,255,255,.12)"; roundRect(x, 112, width, 7, 4); ctx.fill();
+    ctx.fillStyle = boss.color; roundRect(x, 112, width * Math.max(0, boss.hp / boss.maxHp), 7, 4); ctx.fill();
+  }
+
+  function addParticle(x, y, color, count, speed) {
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const velocity = random(speed * .25, speed);
+      state.particles.push({
+        x, y, vx: Math.cos(angle) * velocity, vy: Math.sin(angle) * velocity,
+        life: random(.25, .7), maxLife: .7, size: random(2, 5), color
+      });
+    }
+  }
+
+  function updateParticles(dt) {
+    for (let i = state.particles.length - 1; i >= 0; i--) {
+      const p = state.particles[i];
+      p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= .96; p.vy *= .96; p.life -= dt;
+      if (p.life <= 0) state.particles.splice(i, 1);
+    }
+  }
+
+  function drawParticles() {
+    state.particles.forEach(p => {
+      ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  function showBanner(text) {
+    state.bannerTimer = 2.1;
+    ui.roomBanner.textContent = text;
+    ui.roomBanner.hidden = false;
+  }
+
+  function showMessage(text) {
+    state.message = text;
+    state.messageTimer = 2.3;
+  }
+
+  function drawMessage() {
+    const alpha = Math.min(1, state.messageTimer * 2);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.font = "700 14px DM Sans";
+    const width = ctx.measureText(state.message).width + 34;
+    ctx.fillStyle = "rgba(8,12,23,.76)";
+    roundRect(W / 2 - width / 2, H - 126, width, 34, 17); ctx.fill();
+    ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.fillText(state.message, W / 2, H - 104);
+    ctx.restore();
+  }
+
+  function updateHud() {
+    if (!state) return;
+    ui.floor.textContent = state.floor;
+    ui.room.textContent = `${state.room}/5`;
+    ui.score.textContent = Math.round(state.score).toLocaleString();
+    ui.coins.textContent = state.coins;
+    ui.health.textContent = `${Math.ceil(state.health)} / ${state.maxHealth}`;
+    ui.healthFill.style.width = `${Math.max(0, state.health / state.maxHealth * 100)}%`;
+
+    state.inventory.forEach((weapon, index) => {
+      const slot = ui.weaponSlots[index];
+      slot.classList.toggle("active", index === state.activeSlot);
+      slot.classList.toggle("empty", !weapon);
+      if (weapon) {
+        const q = qualities[weapon.qualityId];
+        slot.style.setProperty("--slot-color", q.color);
+        ui.weaponQualities[index].textContent = q.name;
+        ui.weaponNames[index].textContent = weapon.name;
+      } else {
+        slot.style.setProperty("--slot-color", "#aab2c0");
+        ui.weaponQualities[index].textContent = "Empty";
+        ui.weaponNames[index].textContent = "Find a weapon";
+      }
+    });
+
+    const weapon = activeWeapon();
+    if (weapon) {
+      ui.ammo.textContent = `${weapon.ammo} / ${weapon.reserve}`;
+      if (state.player.reloading > 0) {
+        ui.reloadLabel.textContent = `Reloading ${state.player.reloading.toFixed(1)}s`;
+      } else if (weapon.ammo === 0 && weapon.reserve === 0) {
+        ui.reloadLabel.textContent = "No ammo";
+      } else {
+        ui.reloadLabel.textContent = "R to reload";
+      }
+    }
+
+    const skillMax = characters[selectedCharacter].skillCooldown * state.skillMult;
+    const skillRatio = 1 - state.player.skillCooldown / skillMax;
+    ui.skillFill.style.width = `${clamp(skillRatio, 0, 1) * 100}%`;
+    ui.skillCooldown.textContent = state.player.skillCooldown > 0 ? state.player.skillCooldown.toFixed(1) : "READY";
+    const dashRatio = 1 - state.player.dashCooldown / 2.15;
+    ui.dashFill.style.width = `${clamp(dashRatio, 0, 1) * 100}%`;
+    ui.dashCooldown.textContent = state.player.dashCooldown > 0 ? state.player.dashCooldown.toFixed(1) : "READY";
+  }
+
+  function togglePause(force) {
+    if (!state || state.gameOver || state.choosingTalent) return;
+    state.paused = force === undefined ? !state.paused : force;
+    ui.pauseScreen.hidden = !state.paused;
+    if (state.paused) pointer.down = false;
+  }
+
+  function canvasPoint(event) {
+    const rect = canvas.getBoundingClientRect();
+    return { x: (event.clientX - rect.left) * W / rect.width, y: (event.clientY - rect.top) * H / rect.height };
+  }
+
+  ui.characterCards.forEach(card => {
+    card.addEventListener("click", () => {
+      selectedCharacter = card.dataset.character;
+      ui.characterCards.forEach(c => c.classList.toggle("selected", c === card));
+    });
+  });
+  ui.startButton.addEventListener("click", startGame);
+  ui.restartButton.addEventListener("click", startGame);
+  ui.pauseButton.addEventListener("click", () => togglePause());
+  ui.resumeButton.addEventListener("click", () => togglePause(false));
+  ui.weaponSlots.forEach((slot, index) => slot.addEventListener("click", () => switchWeapon(index)));
+
+  window.addEventListener("keydown", event => {
+    keys[event.code] = true;
+    if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.code)) event.preventDefault();
+    if (event.repeat && ["KeyF", "KeyQ", "KeyR", "KeyE", "ShiftLeft", "ShiftRight"].includes(event.code)) return;
+    if (event.code === "Escape") togglePause();
+    if (event.code === "KeyF") interact();
+    if (event.code === "KeyQ") cycleWeapon();
+    if (event.code === "KeyR") startReload();
+    if (event.code === "KeyE") useSkill();
+    if (event.code === "ShiftLeft" || event.code === "ShiftRight") useDash();
+    if (event.code === "Digit1") switchWeapon(0);
+    if (event.code === "Digit2") switchWeapon(1);
+  });
+  window.addEventListener("keyup", event => { keys[event.code] = false; });
+  window.addEventListener("blur", () => {
+    pointer.down = false;
+    Object.keys(keys).forEach(k => { keys[k] = false; });
+  });
+
+  canvas.addEventListener("pointermove", event => {
+    const p = canvasPoint(event);
+    pointer.x = p.x; pointer.y = p.y; pointer.inside = true;
+  });
+  canvas.addEventListener("pointerenter", () => { pointer.inside = true; });
+  canvas.addEventListener("pointerleave", () => { pointer.inside = false; pointer.down = false; });
+  canvas.addEventListener("pointerdown", event => {
+    if (event.button !== 0) return;
+    const p = canvasPoint(event);
+    pointer.x = p.x; pointer.y = p.y; pointer.down = true; pointer.inside = true;
+  });
+  window.addEventListener("pointerup", () => { pointer.down = false; });
+  canvas.addEventListener("contextmenu", event => event.preventDefault());
+
+  document.querySelectorAll(".touch-dpad button").forEach(button => {
+    const key = button.dataset.key;
+    const on = event => { event.preventDefault(); touchKeys[key] = true; };
+    const off = event => { event.preventDefault(); touchKeys[key] = false; };
     button.addEventListener("pointerdown", on);
     button.addEventListener("pointerup", off);
     button.addEventListener("pointercancel", off);
     button.addEventListener("pointerleave", off);
-});
+  });
+  bindTouchHold(ui.touchFire, value => { pointer.down = value; pointer.inside = false; });
+  ui.touchInteract.addEventListener("pointerdown", event => { event.preventDefault(); interact(); });
+  ui.touchSwap.addEventListener("pointerdown", event => { event.preventDefault(); cycleWeapon(); });
+  ui.touchReload.addEventListener("pointerdown", event => { event.preventDefault(); startReload(); });
+  ui.touchDash.addEventListener("pointerdown", event => { event.preventDefault(); useDash(); });
+  ui.touchAbility.addEventListener("pointerdown", event => { event.preventDefault(); useSkill(); });
 
-const touchFire = document.querySelector("#touch-fire");
-touchFire.addEventListener("pointerdown", (event) => { event.preventDefault(); pointer.down = true; });
-["pointerup", "pointercancel", "pointerleave"].forEach((name) => {
-    touchFire.addEventListener(name, () => { pointer.down = false; });
-});
-document.querySelector("#touch-ability").addEventListener("click", activateSkill);
-document.querySelector("#touch-dash").addEventListener("click", dash);
-
-function startGame() {
-    unlockAudio();
-    const base = characterStats[selectedCharacter];
-    game = {
-        running: true,
-        paused: false,
-        upgrading: false,
-        over: false,
-        score: 0,
-        wave: 1,
-        coreHealth: 100,
-        coreShield: 0,
-        maxShield: 0,
-        damageReduction: 0,
-        waveRepair: 0,
-        combo: 1,
-        comboTimer: 0,
-        elapsed: 0,
-        spawnTimer: 0,
-        spawned: 0,
-        waveTarget: 10,
-        betweenWaves: false,
-        nextWaveTimer: 0,
-        bossSpawned: false,
-        screenShake: 0,
-        flash: 0,
-        fieldEffect: null,
-        upgradeCount: 0,
-        currentUpgrades: [],
-        drones: 0,
-        droneTimer: 0,
-        player: {
-            ...base,
-            x: canvas.width / 2,
-            y: canvas.height / 2 + 95,
-            radius: 13,
-            angle: -Math.PI / 2,
-            lastShot: -9999,
-            boostTimer: 0,
-            stormTimer: 0,
-            skillCooldown: 0,
-            skillCooldownMax: base.skillCooldown,
-            dashCooldown: 0,
-            dashCooldownMax: 2.7,
-            invulnerable: 0,
-            multiShot: 1,
-            pierce: 0,
-            critChance: 0,
-            bulletRadius: selectedCharacter === "writer" ? 5 : 3.5
-        },
-        bullets: [],
-        enemyProjectiles: [],
-        enemies: [],
-        particles: [],
-        powerups: [],
-        stars: createStars()
-    };
-    ui.start.classList.add("hidden");
-    ui.gameOver.classList.add("hidden");
-    ui.pause.classList.add("hidden");
-    ui.upgrade.classList.add("hidden");
-    ui.hud.classList.remove("hidden");
-    ui.pauseButton.disabled = false;
-    ui.pauseButton.textContent = "Pause";
-    ui.stateLabel.textContent = `${capitalize(selectedCharacter)} active`;
-    ui.skillName.textContent = base.skillName;
-    updateHud();
-    showWaveBanner();
-    cancelAnimationFrame(animationFrame);
-    lastTime = performance.now();
-    animationFrame = requestAnimationFrame(loop);
-}
-
-function loop(time) {
-    const dt = Math.min((time - lastTime) / 1000, 0.033);
-    lastTime = time;
-    if (game.running && !game.paused && !game.upgrading && !game.over) update(dt, time);
-    draw();
-    if (game.running) animationFrame = requestAnimationFrame(loop);
-}
-
-function update(dt, now) {
-    game.elapsed += dt;
-    updatePlayer(dt, now);
-    updateDrones(dt);
-    updateBullets(dt);
-    updateEnemies(dt);
-    updateEnemyProjectiles(dt);
-    updateParticles(dt);
-    updatePowerups(dt);
-    updateWave(dt);
-    game.screenShake = Math.max(0, game.screenShake - dt * 25);
-    game.flash = Math.max(0, game.flash - dt * 4);
-    game.comboTimer -= dt;
-    if (game.fieldEffect) {
-        game.fieldEffect.life -= dt;
-        if (game.fieldEffect.life <= 0) game.fieldEffect = null;
-    }
-    if (game.comboTimer <= 0 && game.combo > 1) {
-        game.combo = 1;
-        updateHud();
-    }
-    updateAbilityHud();
-}
-
-function updatePlayer(dt, now) {
-    const player = game.player;
-    let dx = 0;
-    let dy = 0;
-    if (keys.w || keys.arrowup) dy -= 1;
-    if (keys.s || keys.arrowdown) dy += 1;
-    if (keys.a || keys.arrowleft) dx -= 1;
-    if (keys.d || keys.arrowright) dx += 1;
-    if (dx || dy) {
-        const length = Math.hypot(dx, dy);
-        player.x += dx / length * player.speed * dt;
-        player.y += dy / length * player.speed * dt;
-        player.moveX = dx / length;
-        player.moveY = dy / length;
-    }
-    player.x = clamp(player.x, player.radius + 6, canvas.width - player.radius - 6);
-    player.y = clamp(player.y, player.radius + 6, canvas.height - player.radius - 6);
-    player.skillCooldown = Math.max(0, player.skillCooldown - dt);
-    player.dashCooldown = Math.max(0, player.dashCooldown - dt);
-    player.invulnerable = Math.max(0, player.invulnerable - dt);
-    player.boostTimer = Math.max(0, player.boostTimer - dt);
-    player.stormTimer = Math.max(0, player.stormTimer - dt);
-
-    if (pointer.down && matchMedia("(pointer: coarse)").matches) {
-        const target = nearestEnemy(player.x, player.y);
-        if (target) {
-            pointer.x = target.x;
-            pointer.y = target.y;
-        }
-    }
-    player.angle = Math.atan2(pointer.y - player.y, pointer.x - player.x);
-    const wantsFire = pointer.down || keys[" "];
-    let delay = player.fireDelay;
-    if (player.boostTimer > 0) delay *= 0.55;
-    if (player.stormTimer > 0) delay *= 0.48;
-    if (wantsFire && now - player.lastShot >= delay) shoot(now);
-}
-
-function shoot(now, options = {}) {
-    const player = game.player;
-    player.lastShot = options.drone ? player.lastShot : now;
-    let count = options.count || player.multiShot;
-    if (player.stormTimer > 0 && !options.drone) count = Math.max(count + 2, 4);
-    const totalSpread = count === 1 ? 0 : Math.min(0.44, 0.11 * (count - 1));
-    for (let i = 0; i < count; i++) {
-        const offset = count === 1 ? 0 : -totalSpread / 2 + totalSpread * i / (count - 1);
-        const baseAngle = options.angle ?? player.angle;
-        const angle = baseAngle + offset + (Math.random() - 0.5) * 0.018;
-        const critical = Math.random() < player.critChance;
-        game.bullets.push({
-            x: options.x ?? player.x + Math.cos(angle) * 19,
-            y: options.y ?? player.y + Math.sin(angle) * 19,
-            vx: Math.cos(angle) * player.bulletSpeed,
-            vy: Math.sin(angle) * player.bulletSpeed,
-            radius: options.drone ? 3 : player.bulletRadius,
-            damage: player.damage * (options.drone ? 0.55 : 1) * (critical ? 2 : 1),
-            life: 1.45,
-            color: critical ? "#fff3a6" : player.color,
-            pierce: options.drone ? 0 : player.pierce,
-            hits: new Set()
-        });
-    }
-    const muzzleX = options.x ?? player.x + Math.cos(player.angle) * 20;
-    const muzzleY = options.y ?? player.y + Math.sin(player.angle) * 20;
-    createMuzzle(muzzleX, muzzleY, player.color);
-    playTone(options.drone ? 560 : 460, 0.035, "square", options.drone ? 0.012 : 0.025);
-}
-
-function updateBullets(dt) {
-    game.bullets.forEach((bullet) => {
-        bullet.x += bullet.vx * dt;
-        bullet.y += bullet.vy * dt;
-        bullet.life -= dt;
+  function bindTouchHold(element, callback) {
+    element.addEventListener("pointerdown", event => { event.preventDefault(); callback(true); });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(name => {
+      element.addEventListener(name, event => { event.preventDefault(); callback(false); });
     });
+  }
 
-    for (let i = game.bullets.length - 1; i >= 0; i--) {
-        const bullet = game.bullets[i];
-        let removeBullet = false;
-        for (let j = game.enemies.length - 1; j >= 0; j--) {
-            const enemy = game.enemies[j];
-            if (bullet.hits.has(enemy.id)) continue;
-            if (distance(bullet, enemy) < bullet.radius + enemy.radius) {
-                bullet.hits.add(enemy.id);
-                damageEnemy(j, bullet.damage);
-                createImpact(bullet.x, bullet.y, bullet.color);
-                if (bullet.pierce > 0) bullet.pierce -= 1;
-                else removeBullet = true;
-                break;
-            }
-        }
-        if (removeBullet || bullet.life <= 0 || bullet.x < -30 || bullet.x > canvas.width + 30 || bullet.y < -30 || bullet.y > canvas.height + 30) {
-            game.bullets.splice(i, 1);
-        }
-    }
-}
-
-function damageEnemy(index, amount) {
-    const enemy = game.enemies[index];
-    if (!enemy) return;
-    if (enemy.shield > 0) {
-        const absorbed = Math.min(enemy.shield, amount);
-        enemy.shield -= absorbed;
-        amount -= absorbed;
-    }
-    enemy.hp -= amount;
-    enemy.hitFlash = 0.12;
-    if (enemy.hp <= 0) destroyEnemy(index);
-}
-
-function updateEnemies(dt) {
-    const core = { x: canvas.width / 2, y: canvas.height / 2 };
-    for (let i = game.enemies.length - 1; i >= 0; i--) {
-        const enemy = game.enemies[i];
-        enemy.hitFlash = Math.max(0, (enemy.hitFlash || 0) - dt);
-        enemy.slowTimer = Math.max(0, (enemy.slowTimer || 0) - dt);
-        enemy.pulse += dt * 3;
-        const angle = Math.atan2(core.y - enemy.y, core.x - enemy.x);
-        const range = distance(enemy, core);
-        const slow = enemy.slowTimer > 0 ? 0.32 : 1;
-
-        if (enemy.type === "boss") {
-            if (range > 235) {
-                enemy.x += Math.cos(angle) * enemy.speed * slow * dt;
-                enemy.y += Math.sin(angle) * enemy.speed * slow * dt;
-            }
-            enemy.shootTimer -= dt;
-            enemy.summonTimer -= dt;
-            if (enemy.shootTimer <= 0) {
-                fireBossVolley(enemy, angle);
-                enemy.shootTimer = Math.max(1.25, 2.25 - game.wave * 0.04);
-            }
-            if (enemy.summonTimer <= 0) {
-                spawnSpecific("deadline", enemy.x + 25, enemy.y + 18, 0.82);
-                spawnSpecific("bug", enemy.x - 25, enemy.y - 18, 0.82);
-                enemy.summonTimer = 5.2;
-            }
-        } else {
-            const wobble = enemy.type === "reviewer" ? Math.sin(enemy.pulse * 1.7) * 0.22 : 0;
-            enemy.x += Math.cos(angle + wobble) * enemy.speed * slow * dt;
-            enemy.y += Math.sin(angle + wobble) * enemy.speed * slow * dt;
-        }
-        enemy.angle = angle;
-
-        if (range < enemy.radius + 39 && enemy.type !== "boss") {
-            damageCore(enemy.damage);
-            createExplosion(enemy.x, enemy.y, enemy.color, 14);
-            game.enemies.splice(i, 1);
-        }
-    }
-}
-
-function fireBossVolley(enemy, angleToCore) {
-    for (let i = -1; i <= 1; i++) {
-        const angle = angleToCore + i * 0.2;
-        game.enemyProjectiles.push({
-            x: enemy.x,
-            y: enemy.y,
-            vx: Math.cos(angle) * 155,
-            vy: Math.sin(angle) * 155,
-            radius: 7,
-            damage: 8,
-            life: 5,
-            color: "#ff7592"
-        });
-    }
-    createExplosion(enemy.x, enemy.y, "#ff7592", 7);
-    playTone(92, 0.12, "sawtooth", 0.035);
-}
-
-function updateEnemyProjectiles(dt) {
-    const core = { x: canvas.width / 2, y: canvas.height / 2, radius: 39 };
-    for (let i = game.enemyProjectiles.length - 1; i >= 0; i--) {
-        const shot = game.enemyProjectiles[i];
-        shot.x += shot.vx * dt;
-        shot.y += shot.vy * dt;
-        shot.life -= dt;
-
-        if (distance(shot, game.player) < shot.radius + game.player.radius && game.player.invulnerable <= 0) {
-            game.player.invulnerable = 0.7;
-            game.combo = 1;
-            game.screenShake = 4;
-            createExplosion(shot.x, shot.y, shot.color, 8);
-            game.enemyProjectiles.splice(i, 1);
-            updateHud();
-            continue;
-        }
-        if (distance(shot, core) < shot.radius + core.radius) {
-            damageCore(shot.damage);
-            createExplosion(shot.x, shot.y, shot.color, 8);
-            game.enemyProjectiles.splice(i, 1);
-        } else if (shot.life <= 0) {
-            game.enemyProjectiles.splice(i, 1);
-        }
-    }
-}
-
-function updateWave(dt) {
-    if (game.betweenWaves) {
-        game.nextWaveTimer -= dt;
-        if (game.nextWaveTimer <= 0) beginNextWave();
-        return;
-    }
-    game.spawnTimer -= dt;
-    if (game.spawned < game.waveTarget && game.spawnTimer <= 0) {
-        spawnEnemy();
-        game.spawned += 1;
-        game.spawnTimer = Math.max(0.24, 1.02 - game.wave * 0.06) + Math.random() * 0.42;
-    }
-    if (game.spawned >= game.waveTarget && game.enemies.length === 0) {
-        completeWave();
-    }
-}
-
-function completeWave() {
-    game.score += 500 * game.wave;
-    game.coreHealth = Math.min(100, game.coreHealth + game.waveRepair);
-    game.enemyProjectiles.length = 0;
-    game.betweenWaves = true;
-    game.nextWaveTimer = Infinity;
-    updateHud();
-    openUpgradeScreen();
-}
-
-function openUpgradeScreen() {
-    game.upgrading = true;
-    pointer.down = false;
-    game.currentUpgrades = getUpgradeChoices();
-    ui.upgradeGrid.innerHTML = "";
-    game.currentUpgrades.forEach((upgrade, index) => {
-        const card = document.createElement("button");
-        card.type = "button";
-        card.className = "upgrade-card";
-        card.innerHTML = `
-            <span class="upgrade-number">0${index + 1}</span>
-            <span class="upgrade-icon">${upgrade.icon}</span>
-            <h3>${upgrade.name}</h3>
-            <p>${upgrade.description}</p>
-            <small>${upgrade.tag}</small>
-        `;
-        card.addEventListener("click", () => chooseUpgrade(index));
-        ui.upgradeGrid.append(card);
+  function nearestEnemy(x, y) {
+    let nearest = null;
+    let best = Infinity;
+    if (!state) return null;
+    state.enemies.forEach(e => {
+      const d = Math.hypot(e.x - x, e.y - y);
+      if (d < best) { best = d; nearest = e; }
     });
-    ui.upgrade.classList.remove("hidden");
-    ui.stateLabel.textContent = "Selecting breakthrough";
-}
+    return nearest;
+  }
 
-function getUpgradeChoices() {
-    const available = upgradePool.filter((upgrade) => !upgrade.available || upgrade.available());
-    const shuffled = [...available].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 3);
-}
-
-function chooseUpgrade(index) {
-    if (!game.upgrading || !game.currentUpgrades[index]) return;
-    game.currentUpgrades[index].apply();
-    game.upgradeCount += 1;
-    game.upgrading = false;
-    game.currentUpgrades = [];
-    game.betweenWaves = true;
-    game.nextWaveTimer = 0.75;
-    ui.upgrade.classList.add("hidden");
-    ui.stateLabel.textContent = `${capitalize(selectedCharacter)} active`;
-    playTone(720, 0.16, "sine", 0.05);
-    updateHud();
-    lastTime = performance.now();
-}
-
-function beginNextWave() {
-    game.wave += 1;
-    game.waveTarget = 8 + game.wave * 3 + (game.wave % 5 === 0 ? 1 : 0);
-    game.spawned = 0;
-    game.spawnTimer = 0.35;
-    game.bossSpawned = false;
-    game.betweenWaves = false;
-    game.coreShield = game.maxShield;
-    showWaveBanner();
-    updateHud();
-}
-
-function spawnEnemy() {
-    let type = pickEnemyType();
-    if (game.wave % 5 === 0 && !game.bossSpawned) {
-        type = "boss";
-        game.bossSpawned = true;
-    }
-    spawnSpecific(type);
-}
-
-function pickEnemyType() {
-    const roll = Math.random();
-    if (game.wave >= 5 && roll > 0.89) return "reviewer";
-    if (game.wave >= 4 && roll > 0.74) return "shield";
-    if (game.wave >= 3 && roll > 0.58) return "replicator";
-    if (game.wave >= 2 && roll > 0.34) return "deadline";
-    return "bug";
-}
-
-function spawnSpecific(type, x, y, scaleOverride) {
-    const base = enemyTypes[type];
-    const position = x == null || y == null ? randomEdgePosition(type === "boss" ? 55 : 35) : { x, y };
-    const scale = scaleOverride || 1 + (game.wave - 1) * (type === "boss" ? 0.13 : 0.085);
-    const enemy = {
-        ...base,
-        id: ++enemyId,
-        type,
-        x: position.x,
-        y: position.y,
-        hp: base.hp * scale,
-        maxHp: base.hp * scale,
-        shield: (base.shield || 0) * scale,
-        maxEnemyShield: (base.shield || 0) * scale,
-        speed: base.speed * (1 + (game.wave - 1) * 0.022),
-        pulse: Math.random() * Math.PI * 2,
-        angle: 0,
-        slowTimer: 0,
-        hitFlash: 0,
-        shootTimer: 1.4,
-        summonTimer: 4.3
-    };
-    game.enemies.push(enemy);
-    return enemy;
-}
-
-function randomEdgePosition(padding) {
-    const side = Math.floor(Math.random() * 4);
-    if (side === 0) return { x: Math.random() * canvas.width, y: -padding };
-    if (side === 1) return { x: canvas.width + padding, y: Math.random() * canvas.height };
-    if (side === 2) return { x: Math.random() * canvas.width, y: canvas.height + padding };
-    return { x: -padding, y: Math.random() * canvas.height };
-}
-
-function destroyEnemy(index) {
-    const enemy = game.enemies[index];
-    if (!enemy) return;
-    game.score += Math.round(enemy.points * game.combo);
-    game.combo = Math.min(8, game.combo + (enemy.type === "boss" ? 1 : 0.25));
-    game.comboTimer = 2.2;
-    createExplosion(enemy.x, enemy.y, enemy.color, enemy.type === "boss" ? 44 : enemy.type === "reviewer" ? 22 : 11);
-    game.enemies.splice(index, 1);
-
-    if (enemy.type === "replicator") {
-        spawnSpecific("bug", enemy.x - 12, enemy.y, 0.72);
-        spawnSpecific("bug", enemy.x + 12, enemy.y, 0.72);
-    }
-    if (enemy.type === "boss") {
-        game.coreHealth = Math.min(100, game.coreHealth + 25);
-        spawnPowerup("citation", enemy.x, enemy.y);
-        game.screenShake = 14;
-    } else if (Math.random() < 0.05) {
-        spawnPowerup(Math.random() < 0.5 ? "coffee" : "citation", enemy.x, enemy.y);
-    }
-    playTone(enemy.type === "boss" ? 72 : enemy.type === "reviewer" ? 105 : 150, enemy.type === "boss" ? 0.22 : 0.08, "sawtooth", 0.04);
-    updateHud();
-}
-
-function damageCore(amount) {
-    let remaining = amount * (1 - game.damageReduction);
-    if (game.coreShield > 0) {
-        const absorbed = Math.min(game.coreShield, remaining);
-        game.coreShield -= absorbed;
-        remaining -= absorbed;
-    }
-    game.coreHealth = Math.max(0, game.coreHealth - remaining);
-    game.screenShake = 8;
-    game.flash = 0.7;
-    game.combo = 1;
-    playTone(70, 0.18, "sawtooth", 0.06);
-    updateHud();
-    if (game.coreHealth <= 0) endGame();
-}
-
-function activateSkill() {
-    if (!game.running || game.paused || game.upgrading || game.over || game.player.skillCooldown > 0) return;
-    const player = game.player;
-    player.skillCooldown = player.skillCooldownMax;
-
-    if (selectedCharacter === "analyst") {
-        game.enemies.forEach((enemy) => { enemy.slowTimer = Math.max(enemy.slowTimer, 4.5); });
-        game.fieldEffect = { type: "freeze", life: 4.5, maxLife: 4.5 };
-        createExplosion(player.x, player.y, "#9b87ff", 30);
-        playTone(310, 0.28, "sine", 0.05);
-    } else if (selectedCharacter === "hacker") {
-        game.fieldEffect = { type: "pulse", life: 0.65, maxLife: 0.65 };
-        for (let i = game.enemies.length - 1; i >= 0; i--) {
-            const enemy = game.enemies[i];
-            const range = distance(player, enemy);
-            if (range <= 235) {
-                const falloff = 1 - range / 470;
-                damageEnemy(i, player.damage * 4.2 * falloff);
-            }
-        }
-        createExplosion(player.x, player.y, "#39c9bd", 36);
-        playTone(180, 0.22, "square", 0.055);
-    } else {
-        player.stormTimer = 6.5;
-        player.boostTimer = Math.max(player.boostTimer, 6.5);
-        game.fieldEffect = { type: "storm", life: 6.5, maxLife: 6.5 };
-        createExplosion(player.x, player.y, "#f0a653", 22);
-        playTone(620, 0.24, "triangle", 0.05);
-    }
-    updateAbilityHud();
-}
-
-function dash() {
-    if (!game.running || game.paused || game.upgrading || game.over || game.player.dashCooldown > 0) return;
-    const player = game.player;
-    let dx = player.moveX || 0;
-    let dy = player.moveY || 0;
-    if (!dx && !dy) {
-        dx = Math.cos(player.angle);
-        dy = Math.sin(player.angle);
-    }
-    const startX = player.x;
-    const startY = player.y;
-    player.x = clamp(player.x + dx * 125, player.radius + 6, canvas.width - player.radius - 6);
-    player.y = clamp(player.y + dy * 125, player.radius + 6, canvas.height - player.radius - 6);
-    player.dashCooldown = player.dashCooldownMax;
-    player.invulnerable = 0.42;
-    for (let i = 0; i < 14; i++) {
-        const t = i / 13;
-        game.particles.push({
-            x: startX + (player.x - startX) * t,
-            y: startY + (player.y - startY) * t,
-            vx: (Math.random() - 0.5) * 25,
-            vy: (Math.random() - 0.5) * 25,
-            color: player.color,
-            life: 0.35,
-            maxLife: 0.35,
-            radius: 2.5
-        });
-    }
-    playTone(240, 0.08, "sine", 0.035);
-    updateAbilityHud();
-}
-
-function updateDrones(dt) {
-    if (!game.drones) return;
-    game.droneTimer -= dt;
-    if (game.droneTimer > 0) return;
-    const target = nearestEnemy(game.player.x, game.player.y);
-    if (!target) return;
-    for (let i = 0; i < game.drones; i++) {
-        const position = dronePosition(i);
-        shoot(performance.now(), {
-            drone: true,
-            x: position.x,
-            y: position.y,
-            angle: Math.atan2(target.y - position.y, target.x - position.x),
-            count: 1
-        });
-    }
-    game.droneTimer = Math.max(0.38, 0.82 - game.drones * 0.08);
-}
-
-function dronePosition(index) {
-    const angle = game.elapsed * 1.7 + index * Math.PI * 2 / Math.max(1, game.drones);
-    return {
-        x: game.player.x + Math.cos(angle) * 38,
-        y: game.player.y + Math.sin(angle) * 38
-    };
-}
-
-function spawnPowerup(type, x = canvas.width / 2 + (Math.random() - 0.5) * 180, y = canvas.height / 2 + (Math.random() - 0.5) * 140) {
-    game.powerups.push({ type, x, y, radius: 13, life: 9, pulse: 0 });
-}
-
-function updatePowerups(dt) {
-    for (let i = game.powerups.length - 1; i >= 0; i--) {
-        const item = game.powerups[i];
-        item.life -= dt;
-        item.pulse += dt * 4;
-        if (distance(item, game.player) < item.radius + game.player.radius) {
-            if (item.type === "coffee") game.coreHealth = Math.min(100, game.coreHealth + 18);
-            else game.player.boostTimer = 8;
-            createExplosion(item.x, item.y, "#65dccd", 13);
-            playTone(620, 0.13, "sine", 0.05);
-            game.powerups.splice(i, 1);
-            updateHud();
-        } else if (item.life <= 0) {
-            game.powerups.splice(i, 1);
-        }
-    }
-}
-
-function endGame() {
-    game.over = true;
-    game.running = false;
-    ui.hud.classList.add("hidden");
-    ui.upgrade.classList.add("hidden");
-    ui.gameOver.classList.remove("hidden");
-    ui.pauseButton.disabled = true;
-    const score = Math.round(game.score);
-    const best = Math.max(score, Number(localStorage.getItem("thesisDefenseBest") || 0));
-    localStorage.setItem("thesisDefenseBest", String(best));
-    ui.finalScore.textContent = score.toLocaleString();
-    ui.finalWave.textContent = game.wave;
-    ui.bestScore.textContent = best.toLocaleString();
-    ui.resultTitle.textContent = game.wave >= 10 ? "Defense passed with distinction." : game.wave >= 5 ? "Conditional pass granted." : game.wave >= 3 ? "Major revisions required." : "The committee was unconvinced.";
-    ui.resultNote.textContent = `Build completed with ${game.upgradeCount} upgrades and ${game.drones} research assistant${game.drones === 1 ? "" : "s"}.`;
-    ui.stateLabel.textContent = "Defense concluded";
-    draw();
-}
-
-function togglePause() {
-    if (!game.running || game.over || game.upgrading) return;
-    game.paused = !game.paused;
-    ui.pause.classList.toggle("hidden", !game.paused);
-    ui.pauseButton.textContent = game.paused ? "Resume" : "Pause";
-    ui.stateLabel.textContent = game.paused ? "Paused" : `${capitalize(selectedCharacter)} active`;
-    if (!game.paused) lastTime = performance.now();
-}
-
-function showCharacterSelect() {
-    game.running = false;
-    ui.gameOver.classList.add("hidden");
-    ui.upgrade.classList.add("hidden");
-    ui.start.classList.remove("hidden");
-    ui.stateLabel.textContent = "Awaiting candidate";
-}
-
-function draw() {
-    ctx.save();
-    if (game.screenShake) ctx.translate((Math.random() - 0.5) * game.screenShake, (Math.random() - 0.5) * game.screenShake);
-    drawBackground();
-    if (game.player) {
-        drawCore();
-        drawPowerups();
-        drawBullets();
-        drawEnemyProjectiles();
-        drawEnemies();
-        drawDrones();
-        drawPlayer();
-        drawFieldEffect();
-        drawParticles();
-        drawBossBar();
-    } else {
-        drawPreview();
-    }
-    if (game.flash) {
-        ctx.fillStyle = `rgba(239,93,106,${game.flash * 0.18})`;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-    ctx.restore();
-}
-
-function drawBackground() {
-    const gradient = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 20, canvas.width / 2, canvas.height / 2, 560);
-    gradient.addColorStop(0, "#202342");
-    gradient.addColorStop(1, "#0c0e1d");
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = "rgba(132,137,176,.08)";
-    ctx.lineWidth = 1;
-    for (let x = 0; x < canvas.width; x += 48) {
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
-    }
-    for (let y = 0; y < canvas.height; y += 48) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
-    }
-    const stars = game.stars || createStars();
-    stars.forEach((star) => {
-        ctx.fillStyle = `rgba(185,190,225,${star.alpha})`;
-        ctx.fillRect(star.x, star.y, star.size, star.size);
-    });
-}
-
-function drawCore() {
-    const x = canvas.width / 2;
-    const y = canvas.height / 2;
-    const pulse = 1 + Math.sin(game.elapsed * 3) * 0.05;
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.scale(pulse, pulse);
-    if (game.coreShield > 0) {
-        ctx.strokeStyle = "rgba(110,214,238,.7)";
-        ctx.lineWidth = 5;
-        ctx.shadowColor = "#6ed6ee";
-        ctx.shadowBlur = 16;
-        ctx.beginPath(); ctx.arc(0, 0, 51, 0, Math.PI * 2); ctx.stroke();
-    }
-    ctx.shadowColor = "#65dccd";
-    ctx.shadowBlur = 28;
-    ctx.fillStyle = "rgba(101,220,205,.15)";
-    ctx.beginPath(); ctx.arc(0, 0, 46, 0, Math.PI * 2); ctx.fill();
-    ctx.shadowBlur = 12;
-    ctx.fillStyle = "#65dccd";
-    roundRect(ctx, -36, -29, 72, 58, 9);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = "#142236";
-    roundRect(ctx, -29, -21, 58, 42, 5);
-    ctx.fill();
-    ctx.fillStyle = "#bff9f1";
-    ctx.font = "700 8px Space Grotesk";
-    ctx.textAlign = "center";
-    ctx.fillText("THESIS", 0, -3);
-    ctx.fillStyle = "#65dccd";
-    ctx.font = "600 6px DM Sans";
-    ctx.fillText(game.coreShield > 0 ? `SHIELD ${Math.ceil(game.coreShield)}` : "v2.0 FINAL", 0, 8);
-    ctx.restore();
-}
-
-function drawPlayer() {
-    const player = game.player;
-    ctx.save();
-    ctx.globalAlpha = player.invulnerable > 0 && Math.sin(game.elapsed * 30) > 0 ? 0.35 : 1;
-    ctx.translate(player.x, player.y);
-    ctx.rotate(player.angle);
-    ctx.shadowColor = player.color;
-    ctx.shadowBlur = 18;
-    ctx.fillStyle = player.color;
+  function pickupColor(type) {
+    return type === "health" ? "#ff6d82" : type === "ammo" ? "#70c9ff" : "#ffd465";
+  }
+  function distance(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+  function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
+  function random(min, max) { return min + Math.random() * (max - min); }
+  function shuffled(array) { return [...array].sort(() => Math.random() - .5); }
+  function isTouchDevice() { return matchMedia("(pointer: coarse)").matches || "ontouchstart" in window; }
+  function roundRect(x, y, width, height, radius) {
     ctx.beginPath();
-    ctx.moveTo(19, 0);
-    ctx.lineTo(-11, -11);
-    ctx.lineTo(-7, 0);
-    ctx.lineTo(-11, 11);
+    ctx.roundRect(x, y, width, height, radius);
+  }
+  function polygon(x, y, radius, sides) {
+    ctx.beginPath();
+    for (let i = 0; i < sides; i++) {
+      const angle = i / sides * Math.PI * 2 - Math.PI / 2;
+      const px = x + Math.cos(angle) * radius;
+      const py = y + Math.sin(angle) * radius;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
     ctx.closePath();
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = "#f5f3ff";
-    ctx.beginPath(); ctx.arc(-1, 0, 5, 0, Math.PI * 2); ctx.fill();
-    ctx.restore();
-    if (player.boostTimer > 0 || player.stormTimer > 0) {
-        ctx.strokeStyle = `rgba(255,209,102,${0.45 + Math.sin(game.elapsed * 8) * 0.2})`;
-        ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(player.x, player.y, 21, 0, Math.PI * 2); ctx.stroke();
-    }
-}
+  }
 
-function drawEnemies() {
-    game.enemies.forEach((enemy) => {
-        ctx.save();
-        ctx.translate(enemy.x, enemy.y);
-        ctx.rotate(enemy.type === "deadline" ? enemy.pulse : enemy.angle);
-        ctx.shadowColor = enemy.color;
-        ctx.shadowBlur = enemy.type === "boss" ? 24 : enemy.type === "reviewer" ? 16 : 9;
-        ctx.fillStyle = enemy.hitFlash > 0 ? "#ffffff" : enemy.color;
-        if (enemy.type === "deadline" || enemy.type === "replicator") {
-            ctx.beginPath();
-            const points = enemy.type === "replicator" ? 6 : 8;
-            for (let i = 0; i < points; i++) {
-                const angle = i * Math.PI * 2 / points;
-                const radius = i % 2 ? enemy.radius * 0.7 : enemy.radius;
-                const px = Math.cos(angle) * radius;
-                const py = Math.sin(angle) * radius;
-                if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-            }
-            ctx.closePath(); ctx.fill();
-        } else if (enemy.type === "boss") {
-            ctx.beginPath();
-            for (let i = 0; i < 12; i++) {
-                const angle = i * Math.PI / 6;
-                const radius = i % 2 ? enemy.radius * 0.78 : enemy.radius;
-                const px = Math.cos(angle) * radius;
-                const py = Math.sin(angle) * radius;
-                if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-            }
-            ctx.closePath(); ctx.fill();
-        } else {
-            ctx.beginPath(); ctx.arc(0, 0, enemy.radius, 0, Math.PI * 2); ctx.fill();
-        }
-        if (enemy.type === "shield" && enemy.shield > 0) {
-            ctx.strokeStyle = "rgba(220,249,255,.9)";
-            ctx.lineWidth = 4;
-            ctx.beginPath(); ctx.arc(0, 0, enemy.radius + 5, 0, Math.PI * 2); ctx.stroke();
-        }
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = enemy.type === "shield" ? "#172035" : "#fff";
-        ctx.font = `700 ${enemy.type === "boss" ? 8 : enemy.type === "reviewer" ? 9 : 8}px Space Grotesk`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(enemy.label, 0, 0);
-        ctx.restore();
-
-        if (enemy.hp < enemy.maxHp && enemy.type !== "boss") {
-            const width = enemy.radius * 2;
-            ctx.fillStyle = "rgba(0,0,0,.45)";
-            ctx.fillRect(enemy.x - width / 2, enemy.y - enemy.radius - 9, width, 3);
-            ctx.fillStyle = "#70e2d7";
-            ctx.fillRect(enemy.x - width / 2, enemy.y - enemy.radius - 9, width * Math.max(0, enemy.hp) / enemy.maxHp, 3);
-        }
-    });
-}
-
-function drawBossBar() {
-    const boss = game.enemies.find((enemy) => enemy.type === "boss");
-    if (!boss) return;
-    const width = 330;
-    const x = canvas.width / 2 - width / 2;
-    const y = 63;
-    ctx.fillStyle = "rgba(12,14,29,.88)";
-    roundRect(ctx, x - 8, y - 15, width + 16, 32, 8);
-    ctx.fill();
-    ctx.fillStyle = "#8d91a7";
-    ctx.font = "700 7px Space Grotesk";
-    ctx.textAlign = "center";
-    ctx.fillText("COMMITTEE CHAIR", canvas.width / 2, y - 5);
-    ctx.fillStyle = "#34364d";
-    ctx.fillRect(x, y, width, 6);
-    ctx.fillStyle = "#d84f73";
-    ctx.fillRect(x, y, width * Math.max(0, boss.hp) / boss.maxHp, 6);
-}
-
-function drawBullets() {
-    game.bullets.forEach((bullet) => {
-        ctx.shadowColor = bullet.color;
-        ctx.shadowBlur = 11;
-        ctx.fillStyle = bullet.color;
-        ctx.beginPath(); ctx.arc(bullet.x, bullet.y, bullet.radius, 0, Math.PI * 2); ctx.fill();
-        ctx.shadowBlur = 0;
-    });
-}
-
-function drawEnemyProjectiles() {
-    game.enemyProjectiles.forEach((shot) => {
-        ctx.shadowColor = shot.color;
-        ctx.shadowBlur = 14;
-        ctx.fillStyle = shot.color;
-        ctx.beginPath(); ctx.arc(shot.x, shot.y, shot.radius, 0, Math.PI * 2); ctx.fill();
-        ctx.shadowBlur = 0;
-    });
-}
-
-function drawDrones() {
-    for (let i = 0; i < game.drones; i++) {
-        const position = dronePosition(i);
-        ctx.shadowColor = "#70e2d7";
-        ctx.shadowBlur = 12;
-        ctx.fillStyle = "#70e2d7";
-        ctx.beginPath(); ctx.arc(position.x, position.y, 6, 0, Math.PI * 2); ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = "#172035";
-        ctx.font = "800 5px Space Grotesk";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("AI", position.x, position.y);
-    }
-}
-
-function drawFieldEffect() {
-    if (!game.fieldEffect) return;
-    const effect = game.fieldEffect;
-    const progress = 1 - effect.life / effect.maxLife;
-    if (effect.type === "freeze") {
-        ctx.strokeStyle = `rgba(155,135,255,${0.25 + Math.sin(game.elapsed * 5) * 0.08})`;
-        ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.arc(canvas.width / 2, canvas.height / 2, 250, 0, Math.PI * 2); ctx.stroke();
-    } else if (effect.type === "pulse") {
-        ctx.strokeStyle = `rgba(57,201,189,${1 - progress})`;
-        ctx.lineWidth = 7 * (1 - progress);
-        ctx.beginPath(); ctx.arc(game.player.x, game.player.y, 235 * progress, 0, Math.PI * 2); ctx.stroke();
-    } else {
-        ctx.strokeStyle = `rgba(240,166,83,${0.3 + Math.sin(game.elapsed * 12) * 0.12})`;
-        ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(game.player.x, game.player.y, 29, game.elapsed * 4, game.elapsed * 4 + Math.PI * 1.4); ctx.stroke();
-    }
-}
-
-function drawPowerups() {
-    game.powerups.forEach((item) => {
-        const scale = 1 + Math.sin(item.pulse) * 0.1;
-        ctx.save();
-        ctx.translate(item.x, item.y);
-        ctx.scale(scale, scale);
-        ctx.shadowColor = item.type === "coffee" ? "#65dccd" : "#ffd166";
-        ctx.shadowBlur = 16;
-        ctx.fillStyle = item.type === "coffee" ? "#65dccd" : "#ffd166";
-        ctx.beginPath(); ctx.arc(0, 0, item.radius, 0, Math.PI * 2); ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = "#172035";
-        ctx.font = "800 9px Space Grotesk";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(item.type === "coffee" ? "+" : "C", 0, 0);
-        ctx.restore();
-    });
-}
-
-function createStars() {
-    return Array.from({ length: 80 }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        size: Math.random() * 1.5 + 0.4,
-        alpha: Math.random() * 0.28 + 0.05
-    }));
-}
-
-function createMuzzle(x, y, color) {
-    for (let i = 0; i < 4; i++) game.particles.push(particle(x, y, color, 80, 0.18, 2));
-}
-
-function createImpact(x, y, color) {
-    for (let i = 0; i < 5; i++) game.particles.push(particle(x, y, color, 100, 0.25, 2));
-}
-
-function createExplosion(x, y, color, count) {
-    for (let i = 0; i < count; i++) game.particles.push(particle(x, y, color, 170, 0.55, Math.random() * 3 + 1));
-}
-
-function particle(x, y, color, speed, life, radius) {
-    const angle = Math.random() * Math.PI * 2;
-    const velocity = Math.random() * speed;
-    return { x, y, vx: Math.cos(angle) * velocity, vy: Math.sin(angle) * velocity, color, life, maxLife: life, radius };
-}
-
-function updateParticles(dt) {
-    for (let i = game.particles.length - 1; i >= 0; i--) {
-        const item = game.particles[i];
-        item.x += item.vx * dt;
-        item.y += item.vy * dt;
-        item.vx *= 0.97;
-        item.vy *= 0.97;
-        item.life -= dt;
-        if (item.life <= 0) game.particles.splice(i, 1);
-    }
-}
-
-function drawParticles() {
-    game.particles.forEach((item) => {
-        ctx.globalAlpha = item.life / item.maxLife;
-        ctx.fillStyle = item.color;
-        ctx.beginPath(); ctx.arc(item.x, item.y, item.radius, 0, Math.PI * 2); ctx.fill();
-    });
-    ctx.globalAlpha = 1;
-}
-
-function drawPreview() {
-    const x = canvas.width / 2;
-    const y = canvas.height / 2;
-    ctx.strokeStyle = "rgba(101,220,205,.18)";
-    ctx.lineWidth = 2;
-    for (let radius = 60; radius <= 180; radius += 40) {
-        ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.stroke();
-    }
-}
-
-function updateHud() {
-    ui.wave.textContent = game.wave;
-    ui.score.textContent = String(Math.round(game.score)).padStart(5, "0");
-    ui.combo.textContent = `x${game.combo.toFixed(game.combo % 1 ? 2 : 0)}`;
-    ui.build.textContent = game.upgradeCount;
-    ui.health.textContent = game.coreShield > 0 ? `${Math.ceil(game.coreHealth)}% +${Math.ceil(game.coreShield)}` : `${Math.ceil(game.coreHealth)}%`;
-    ui.healthFill.style.width = `${game.coreHealth}%`;
-    ui.healthFill.style.background = game.coreHealth > 55 ? "linear-gradient(90deg,#38c7bd,#7ae3b4)" : game.coreHealth > 25 ? "#ffd166" : "#ef5d6a";
-    updateAbilityHud();
-}
-
-function updateAbilityHud() {
-    if (!game.player) return;
-    const player = game.player;
-    const skillRatio = 1 - player.skillCooldown / player.skillCooldownMax;
-    const dashRatio = 1 - player.dashCooldown / player.dashCooldownMax;
-    ui.skillFill.style.width = `${clamp(skillRatio, 0, 1) * 100}%`;
-    ui.dashFill.style.width = `${clamp(dashRatio, 0, 1) * 100}%`;
-    ui.skillCooldown.textContent = player.skillCooldown <= 0 ? "READY" : `${player.skillCooldown.toFixed(1)}s`;
-    ui.dashCooldown.textContent = player.dashCooldown <= 0 ? "READY" : `${player.dashCooldown.toFixed(1)}s`;
-}
-
-function showWaveBanner() {
-    let name = waveNames[Math.min(game.wave - 1, waveNames.length - 1)];
-    if (game.wave % 5 === 0) name = "BOSS: Committee Chair";
-    else if (game.wave % 4 === 0) name = "Paywall Protocol";
-    else if (game.wave % 3 === 0) name = "Replication Crisis";
-    ui.waveBanner.innerHTML = `WAVE ${game.wave}<span>${name}</span>`;
-    ui.waveBanner.classList.add("show");
-    setTimeout(() => ui.waveBanner.classList.remove("show"), 1700);
-}
-
-function updatePointer(event) {
-    const rect = canvas.getBoundingClientRect();
-    pointer.x = (event.clientX - rect.left) / rect.width * canvas.width;
-    pointer.y = (event.clientY - rect.top) / rect.height * canvas.height;
-}
-
-function nearestEnemy(x, y) {
-    return game.enemies?.reduce((best, enemy) => {
-        const currentDistance = Math.hypot(enemy.x - x, enemy.y - y);
-        return !best || currentDistance < best.distance ? { ...enemy, distance: currentDistance } : best;
-    }, null);
-}
-
-function toggleFullscreen() {
-    if (!document.fullscreenElement) stage.requestFullscreen?.();
-    else document.exitFullscreen?.();
-}
-
-function unlockAudio() {
-    if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioContext.state === "suspended") audioContext.resume();
-}
-
-function playTone(frequency, duration, type, volume) {
-    if (!audioEnabled || !audioContext) return;
-    const oscillator = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-    oscillator.type = type;
-    oscillator.frequency.value = frequency;
-    gain.gain.setValueAtTime(volume, audioContext.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
-    oscillator.connect(gain);
-    gain.connect(audioContext.destination);
-    oscillator.start();
-    oscillator.stop(audioContext.currentTime + duration);
-}
-
-function roundRect(context, x, y, width, height, radius) {
-    context.beginPath();
-    context.roundRect(x, y, width, height, radius);
-}
-
-function distance(a, b) {
-    return Math.hypot(a.x - b.x, a.y - b.y);
-}
-
-function clamp(value, min, max) {
-    return Math.max(min, Math.min(max, value));
-}
-
-function capitalize(value) {
-    return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
-game.stars = createStars();
-draw();
+  drawBackdrop();
+})();

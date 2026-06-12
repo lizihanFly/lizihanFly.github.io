@@ -8,170 +8,183 @@
 
 **Source repository:** <https://github.com/lizihanFly/lizihanFly.github.io>
 
-**Date:** June 10, 2026
+**Date:** June 12, 2026
 
 ## 1. Project Summary
 
-Defend Your Thesis is a survival-defense game that runs entirely in a web browser. The player selects a research character and protects a thesis core from three academic threats:
+Defend Your Thesis is an original room-based, top-down roguelite shooter that runs entirely in a web browser. The player chooses a researcher, clears academic combat rooms, opens evidence chests, collects weapons of different qualities, and defeats a boss committee at the end of each floor.
 
-- **Bugs:** balanced enemies with ordinary damage.
-- **Deadlines:** fast enemies that are difficult to intercept.
-- **Reviewer #2:** slow, high-health enemies with heavy damage.
+The new gameplay structure is inspired by the broad conventions of room-based action roguelites, including games such as *Soul Knight*. All code, interface text, Canvas graphics, enemies, weapon names, balance values, and academic theming were created specifically for this assignment. No external game assets were copied.
 
-The application is a stable URL rather than an executable file. It uses only HTML, CSS, the Canvas 2D API, and JavaScript, so GitHub Pages can host it without a build step.
-
-The second gameplay iteration adds a roguelite-style build system, character abilities, dashing, special enemy behavior, and boss waves. These additions preserve the original defense-game brief while making repeated runs meaningfully different.
+The application uses HTML, CSS, JavaScript, and the Canvas 2D API. It is hosted at a stable GitHub Pages URL and requires no build step or server.
 
 ## 2. Requirement Mapping
 
 | Requirement | Implementation |
 |---|---|
 | Functional application | Playable at `thesis-defense.html` |
-| Character selection | Analyst, Hacker, and Writer with different statistics |
-| Game over and score | Final score, wave, result message, and persistent best score |
-| Keyboard controls | WASD/arrows, mouse aim, click/space fire, P/Escape pause |
-| Mouse controls | Pointer aiming and click-to-fire |
-| Mobile controls | On-screen directional pad and auto-aim fire button |
-| Strategic progression | Three-choice upgrade draft after every cleared wave |
-| Active abilities | A different `E` skill for every character and a reusable dash |
-| Enemy variety | Splitting, shielded, ranged, and boss enemies |
-| AI-assisted architecture | Documented in Section 5 |
-| AI-assisted problem solving | Documented in Section 6 |
+| Character selection | Analyst, Hacker, and Writer have different statistics and active abilities |
+| Stable web deployment | Static files hosted through GitHub Pages |
+| Game over and score | Final score, rooms cleared, result message, restart, and persistent best score |
+| Keyboard controls | WASD/arrows, mouse aim, click/space fire, `F` interact, `Q` swap, `R` reload |
+| Mouse controls | Pointer aiming, click-to-fire, and clickable weapon slots |
+| Mobile controls | Direction pad, auto-aim fire, pickup, swap, reload, dash, and skill buttons |
+| Character movement and collision | Arena boundaries and solid room obstacles |
+| AI-assisted development | Architecture and problem solving documented below |
 | Markdown report | This file |
 
 ## 3. Gameplay and Features
 
 ### Core loop
 
-1. Select a candidate.
-2. Move around the arena.
-3. Aim and fire citations at incoming threats.
-4. Stop enemies before they reach the thesis.
-5. Build a score combo through quick eliminations.
-6. Collect coffee or citation power-ups.
-7. Choose one of three research upgrades after each wave.
-8. Combine upgrades into a specialized build.
-9. Defeat the Committee Chair every fifth wave.
+1. Select a researcher.
+2. Enter a research room and defeat all threats.
+3. Open the evidence chest.
+4. Inspect and pick up the generated weapon.
+5. Use the portal to enter the next room.
+6. Defeat the Final Committee in room five.
+7. Choose one permanent research talent.
+8. Continue to a harder floor with the current loadout.
+
+### Room and floor progression
+
+Each floor contains five rooms. The first four use different obstacle layouts and increasingly large enemy groups. Room five contains a boss with projectile volleys and summoned enemies. Enemy health, speed, and damage increase on later floors.
+
+Solid bookcases and lab equipment change movement and firing lines. Bullets collide with these obstacles, so the player must reposition rather than standing in one location.
+
+### Weapon quality and inventory
+
+Weapons use five visible quality levels:
+
+| Quality | Color | General effect |
+|---|---|---|
+| Common | Gray | Base statistics |
+| Uncommon | Green | Improved damage and magazine |
+| Rare | Blue | Stronger damage and magazine |
+| Epic | Purple | Large statistic increase |
+| Legendary | Orange | Highest statistics and an additional weapon trait |
+
+The player can carry two weapons. `F` picks up or replaces a weapon, `Q` switches slots, and `R` reloads. Every weapon has a separate magazine, reserve ammunition, firing delay, reload time, projectile speed, spread, and special behavior.
+
+Current weapon families:
+
+- **Research Pistol:** reliable general-purpose sidearm.
+- **Citation SMG:** fast automatic fire with moderate spread.
+- **Scatter Thesis:** multi-projectile close-range weapon.
+- **Peer Review Railgun:** slow, powerful projectiles that pierce enemies.
+- **Laser Pointer:** accurate sustained fire with piercing.
+- **Grant Launcher:** explosive area damage.
+- **Footnote Repeater:** balanced rapid-fire weapon.
+
+Weapon quality chances improve on later floors, after boss fights, and through the Better Evidence talent.
 
 ### Character design
 
-| Character | Strength | Trade-off |
+| Character | Passive strength | Active ability |
 |---|---|---|
-| Analyst | Balanced speed, fire rate, and damage | No extreme advantage |
-| Hacker | Highest movement and fire rate | Low damage per shot |
-| Writer | Highest damage per citation | Slow movement and fire rate |
+| Analyst | +18% weapon damage | Freezes nearby threats |
+| Hacker | +14% movement speed | Damages nearby enemies and removes projectiles |
+| Writer | +25% maximum integrity | Fires a radial Citation Storm |
 
-Each character also has a unique active ability:
+All characters can dash with `Shift`. Dashing moves quickly through danger and briefly prevents damage.
 
-- **Analyst - Method Freeze:** slows every current enemy for several seconds.
-- **Hacker - Hotfix Pulse:** deals radial damage around the player.
-- **Writer - Citation Storm:** temporarily adds projectiles and greatly increases fire rate.
+### Enemies and rewards
 
-All characters can dash with `Shift`. Dashing repositions the player quickly and briefly avoids boss projectiles.
+- **Bug:** standard close-range threat.
+- **Deadline:** fast, low-health enemy.
+- **Reviewer:** stays at range and fires projectiles.
+- **Replication Error:** splits into smaller enemies.
+- **Major Revision:** slow armored enemy.
+- **Final Committee:** floor boss with volleys and reinforcements.
 
-### Research build system
+Defeated enemies can drop integrity repair, ammunition, or research funding. Cleared rooms contain an evidence chest and exit portal.
 
-After clearing a wave, the player chooses one of three random upgrades. Available upgrades include damage, fire rate, multi-shot, piercing, critical chance, movement, ability cooldown, damage reduction, a renewable thesis shield, automatic repair, projectile velocity, and orbiting research assistants.
+### Permanent talents
 
-Choices are filtered when an upgrade reaches its cap. This prevents invalid choices such as unlimited multi-shot or excessive critical chance.
-
-### Special enemies and boss waves
-
-- **Replicator:** splits into two bugs when destroyed.
-- **Paywall:** has a separate shield that must be removed before health is damaged.
-- **Reviewer #2:** uses a curved movement pattern and deals heavy thesis damage.
-- **Committee Chair:** appears every fifth wave, stops at range, fires projectile volleys, and summons additional threats.
-
-### Progression
-
-Each wave increases enemy count, health, and speed. Deadlines appear from wave two and Reviewer #2 appears from wave three. Clearing a wave gives a score bonus and a power-up.
+After every boss, the player chooses one of three random talents. Talents can improve damage, integrity, movement, reload speed, skill cooldown, armor, ammunition, or future loot quality.
 
 ## 4. Software Architecture
 
-The game uses a state-driven update/render loop:
+The application uses a state-driven update and render loop:
 
 ```text
-Input events
-    |
-    v
-Update player -> abilities -> drones -> bullets -> enemies -> projectiles
-    |
-    v
-Resolve collisions -> score -> shield -> combo -> power-ups
-    |
-    v
-Wave manager -> upgrade draft -> next wave / boss event
-    |
-    v
-Render arena -> entities -> effects -> boss bar -> HUD
+Keyboard / mouse / touch input
+             |
+             v
+Player movement -> dash -> weapon fire -> reload -> active skill
+             |
+             v
+Enemy movement -> ranged attacks -> boss summons
+             |
+             v
+Projectile and obstacle collisions -> damage -> drops -> score
+             |
+             v
+Room clear -> chest -> weapon pickup -> portal -> boss talent
+             |
+             v
+Canvas rendering -> particles -> HUD -> overlays
 ```
 
 Main data groups:
 
-- `characterStats`: movement, fire delay, damage, and bullet speed.
-- `enemyTypes`: health, speed, radius, core damage, and score.
-- `upgradePool`: upgrade availability rules and effects.
-- `game`: current runtime state.
+- `qualities`: color and statistic multipliers for the five loot qualities.
+- `weaponBases`: base statistics and behavior for every weapon family.
+- `characters`: movement, health, damage, and active skill data.
+- `enemyTypes`: health, movement, damage, armor, and behavior flags.
+- `talents`: permanent run upgrades and their state changes.
+- `state`: the complete current run, room, inventory, entities, and timers.
 - `ui`: references to HUD and overlay elements.
-- `keys` and `pointer`: keyboard, mouse, and touch input state.
 
-The `requestAnimationFrame` loop calculates delta time and caps unusually large frame gaps. Movement therefore remains consistent across display refresh rates.
+`requestAnimationFrame` drives the loop. Delta time is capped to prevent large movement jumps after the browser tab returns from the background.
 
 ## 5. AI-Assisted Architecture
 
-An AI coding agent was used inside the development workspace. The initial repository contained a small static homepage, so the architecture needed to remain compatible with GitHub Pages.
+An AI coding agent was used inside the development workspace. It first inspected the existing static GitHub Pages repository and the assignment requirements. The application was kept framework-free because one Canvas scene and static deployment did not justify a package or build system.
 
-The AI agent helped turn the assignment brief into the following modules:
+The AI agent helped:
 
-1. A character-selection overlay.
-2. A Canvas game engine.
-3. A state-based screen system for start, play, pause, and game over.
-4. Keyboard, mouse, and touch input.
-5. A wave and difficulty manager.
-6. Collision detection and entity cleanup.
-7. A data-driven upgrade system.
-8. Character abilities, enemy projectiles, and boss state.
-9. A documentation and testing plan.
-
-The final decision was to avoid a framework because the project has one game scene, no server state, and an existing static deployment. This reduced dependency risk and made the source easy to inspect.
+1. Convert the assignment brief into a playable feature list.
+2. Design a data-driven weapon and quality system.
+3. Separate room state, combat entities, inventory, and UI state.
+4. Implement keyboard, mouse, and touch input through shared actions.
+5. Add obstacle, projectile, enemy, and pickup collision logic.
+6. Build boss progression and permanent talent selection.
+7. Check JavaScript syntax and run automated browser interaction tests.
+8. Update the report and deployment files.
 
 ## 6. AI-Assisted Problem Solving
 
-### Collision detection
+### Data-driven weapon generation
 
-The AI agent proposed circle-based collision checks for bullets, enemies, the player, power-ups, and the thesis core:
+Creating a separate hard-coded version of every weapon at every quality would create many duplicated values. The implementation instead combines one weapon base with one quality multiplier:
 
 ```text
-distance(a, b) < radius(a) + radius(b)
+generated damage = base damage * quality multiplier
+generated magazine = base magazine * quality magazine multiplier
 ```
 
-This is simpler and more reliable for the rounded visual design than rectangular collision boxes.
+This makes future weapon balancing and additions much easier.
 
-### Frame-rate independent movement
+### Inventory replacement
 
-Early game logic could have tied speed to frame count. The implementation instead multiplies velocity by elapsed time (`dt`). The delta is capped at 0.033 seconds so returning to a background tab does not cause entities to jump across the arena.
+The player has two weapon slots. Picking up a weapon fills an empty slot first. If both slots are occupied, the new weapon replaces the active one and the old weapon remains on the floor. This allows comparison without permanently losing the previous choice.
 
-### Input unification
+### Collision and navigation
 
-Keyboard and on-screen direction buttons write to the same `keys` object. Mouse clicks and the touch fire button write to the same `pointer.down` state. This keeps the game logic independent from the physical input method.
+Players and enemies use circle collision against rectangular obstacles. Movement is resolved one axis at a time, which prevents entities from becoming stuck when sliding along a bookcase edge. Bullets are removed when they strike a wall.
 
-The same principle is used for active actions: keyboard `E` and `Shift` call the same ability and dash functions as the mobile buttons.
+### Safe entity lifecycle
 
-### Upgrade state management
+Bullets and pickups are processed in reverse order so removal does not skip later elements. Enemy arrays are copied when explosive damage or active skills may destroy several enemies during one update.
 
-The upgrade screen pauses simulation without ending the animation loop. Enemy movement and projectiles stop while the player makes a decision. After one valid choice is applied, the game safely advances to the next wave and refills any renewable shield.
+### Unified input
 
-### Complex enemy lifecycle
+Keyboard shortcuts and mobile buttons call the same interaction, weapon switching, reloading, dash, and skill functions. Touch firing uses nearest-enemy aiming because a phone has no separate mouse pointer.
 
-Enemy destruction can now produce new enemies, as with the Replicator. Destruction is processed by stable IDs and reverse array iteration so spawned children do not corrupt the current collision pass. Boss projectiles use a separate entity collection because they have different collision rules from player citations.
+### Originality and scope
 
-### Browser audio
-
-The Web Audio API cannot start before user interaction. Audio initialization therefore occurs only after the player presses **Begin defense**. Sound effects are generated with short oscillators, so no copyrighted audio assets or external downloads are required.
-
-### Secret and persistence decisions
-
-The game contains no user accounts or private data. Only the best score is stored in `localStorage`. No gameplay information is sent to a server.
+The requested direction was interpreted as a genre and control reference, not a request to duplicate another game's copyrighted assets or exact presentation. The implementation uses original geometric Canvas art and an academic research theme while adding the requested room, loot, weapon-quality, and combat systems.
 
 ## 7. Testing Strategy
 
@@ -179,57 +192,56 @@ The game contains no user accounts or private data. Only the best score is store
 
 | Test | Expected result |
 |---|---|
-| Select each character | Selected card and runtime statistics change |
-| Hold WASD or arrow key | Player moves and remains inside the arena |
-| Aim and click | Bullet travels toward the pointer |
-| Press space | Player fires toward the current aim direction |
-| Bullet hits enemy | Enemy health decreases; destroyed enemy adds score |
-| Enemy reaches thesis | Thesis integrity decreases |
-| Integrity reaches zero | Game-over overlay appears |
-| Press P or Escape | Game pauses and resumes |
-| Clear a wave | Three valid upgrade cards appear and simulation pauses |
-| Choose upgrade or press 1/2/3 | Effect applies once and next wave begins |
-| Press E for each character | Correct unique ability activates and enters cooldown |
-| Press Shift | Player dashes, stays in bounds, and enters cooldown |
-| Destroy Replicator | Two smaller bugs spawn |
-| Shoot Paywall | Shield is reduced before health |
-| Reach wave 5 | Committee Chair spawns with boss health bar |
-| Wait during boss fight | Boss fires volleys and summons enemies |
-| Collect coffee | Thesis integrity increases, capped at 100 |
-| Collect citation boost | Fire rate increases temporarily |
-| Finish a run | Best score is saved locally |
-| Use mobile controls | Direction buttons move; CITE auto-aims at nearest enemy |
+| Select each researcher | Selected card and runtime statistics change |
+| Move against arena or obstacle | Player remains in valid walkable space |
+| Aim and fire | Projectiles travel toward the pointer |
+| Empty a magazine | Automatic reload begins when reserve ammunition exists |
+| Press `R` | Current weapon reloads without exceeding magazine capacity |
+| Clear a room | Evidence chest and exit portal appear |
+| Open chest | A weapon with a visible random quality appears |
+| Pick up first weapon | Empty second slot receives it and becomes active |
+| Pick up with full inventory | Active weapon is exchanged with the floor weapon |
+| Press `Q`, `1`, or `2` | Valid weapon slot becomes active |
+| Collect drops | Health, ammunition, or funding changes correctly |
+| Press `E` | Selected character's ability activates and enters cooldown |
+| Press `Shift` | Player dashes and briefly avoids damage |
+| Reach room five | Final Committee and boss health bar appear |
+| Defeat boss and use portal | Three permanent talent choices appear |
+| Choose a talent | Effect applies and the next floor starts |
+| Integrity reaches zero | Game-over result appears |
+| Finish a run | Best score is stored in `localStorage` |
+| Use mobile controls | All essential actions remain available |
 
-### Static checks
+### Automated and static checks
 
-- JavaScript syntax is checked with `node --check`.
-- Internal HTML links are checked against files in the repository.
-- The site is served locally over HTTP to avoid file-origin differences.
-- Responsive layouts are reviewed at desktop, tablet, and phone widths.
+- `node --check thesis-defense.js` verifies JavaScript syntax.
+- A headless Chrome load checks browser execution and DOM initialization.
+- Automated Chrome input starts the game, moves, fires, changes ammunition, damages enemies, updates score and health, and records runtime console errors.
+- `git diff --check` checks whitespace and patch consistency.
+- Desktop and narrow responsive layouts are reviewed through browser screenshots.
 
 ## 8. Challenges
 
-### Balancing
+### Combat readability
 
-The three characters needed to feel different without making one obviously superior. Character and upgrade values are stored as data so they can be tuned without rewriting logic.
+Weapon quality, enemy type, bullets, pickups, and room props can compete visually. The game uses consistent quality colors, separate enemy silhouettes, glows, health bars, a boss bar, particles, and restrained screen shake.
 
-### Responsive game controls
+### Balance
 
-A desktop game normally assumes keyboard and mouse input. The mobile layout includes a directional pad and a fire control that automatically aims at the nearest enemy. The Canvas maintains a fixed logical coordinate system while CSS scales it to the available width.
+Fast weapons need lower projectile damage, while slow weapons need stronger impact and special behavior. Balance values are stored in `weaponBases`, `qualities`, and `enemyTypes` so playtesting changes do not require structural rewrites.
 
-### Readable feedback
+### Responsive controls
 
-Many simultaneous enemies can make a game difficult to read. Color, shape, labels, shields, health bars, a boss bar, particles, screen shake, and short synthesized tones provide several types of feedback without requiring image or audio files.
+Desktop players can aim independently with a mouse. Touch players receive auto-aim and dedicated pickup, swap, reload, dash, skill, and fire buttons. The Canvas keeps a fixed logical resolution while CSS scales the display.
 
 ## 9. Limitations and Future Work
 
-- The game has one arena and no narrative level transitions.
-- Difficulty is tuned heuristically and would benefit from user playtest data.
-- Browser best scores are local to one device.
-- Future versions could add more arenas, accessibility settings, build statistics, and an online leaderboard.
+- Balance is currently based on developer playtesting rather than a large player sample.
+- Best scores remain local to one browser.
+- Future versions could add shops, weapon comparison panels, more bosses, sound settings, controller support, and accessibility options.
 
 ## 10. Reflection
 
-The AI agent was most useful for translating requirements into a testable architecture and for checking edge cases across game states. It accelerated implementation, but its suggestions still needed human decisions about scope, visual style, honesty in documentation, and whether a feature improved the assignment.
+The AI agent was most useful for translating a broad gameplay request into data structures, state transitions, and testable interactions. Human judgment remained necessary for scope, originality, visual style, balance, and deciding which mechanics supported the assignment rather than merely adding complexity.
 
-The project moved beyond "prompting for fun" because the final result has explicit requirements, persistent state, input handling, collision rules, error-resistant timing, responsive controls, documentation, and a repeatable test plan. AI supported the engineering process; it did not remove the need for engineering judgment.
+The final project goes beyond a small classroom prototype. It contains a complete room loop, loot progression, two-slot inventory, weapon quality generation, reloading, collision-aware level layouts, bosses, permanent upgrades, responsive controls, persistent scoring, documentation, and a repeatable testing process.

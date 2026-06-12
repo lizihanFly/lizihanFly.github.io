@@ -1,131 +1,146 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>Assignment 4 Report | Lizihan</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <script src="site.js" defer></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Assignment 4 report for Defend Your Thesis, an AI-assisted room-based browser game.">
+  <title>Assignment 4 Report | Lizihan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="site.js" defer></script>
 </head>
 <body>
-    <header class="site-header">
-        <a class="brand" href="index.html"><span class="brand-mark">LZ</span><span>Lizihan Lab</span></a>
-        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><span class="sr-only">Toggle navigation</span></button>
-        <nav id="site-nav" class="site-nav"><a href="index.html">Home</a><a href="thesis-defense.html">Play Game</a><a class="active" href="assignment4-report.html">Report</a><a href="https://github.com/lizihanFly/lizihanFly.github.io/blob/main/assignment4-report.md" target="_blank" rel="noreferrer">Markdown</a></nav>
-    </header>
-    <main class="inner-main shell">
-        <div class="doc-layout">
-            <article class="panel doc-article">
-                <p class="eyebrow">Assignment 4 · Option A · June 10, 2026</p>
-                <h1>Developing an AI-Assisted Application</h1>
-                <p><strong>Student:</strong> Lizihan<br><strong>Project:</strong> Defend Your Thesis<br><strong>Application:</strong> <a href="thesis-defense.html">Play the browser game</a></p>
+  <header class="site-header">
+    <a class="brand" href="index.html"><span class="brand-mark">LZ</span><span>Lizihan Lab</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><span class="sr-only">Toggle navigation</span></button>
+    <nav id="site-nav" class="site-nav">
+      <a href="index.html">Home</a>
+      <a href="thesis-defense.html">Play Game</a>
+      <a class="active" href="assignment4-report.html">Report</a>
+      <a href="https://github.com/lizihanFly/lizihanFly.github.io/blob/main/assignment4-report.md" target="_blank" rel="noreferrer">Markdown</a>
+    </nav>
+  </header>
 
-                <h2 id="summary">1. Project Summary</h2>
-                <p>Defend Your Thesis is a survival-defense game built with HTML, CSS, JavaScript, and the Canvas 2D API. The player protects a thesis core from bugs, deadlines, and Reviewer #2. It runs at a stable GitHub Pages URL with no build step or server.</p>
+  <main class="inner-main shell">
+    <div class="doc-layout">
+      <article class="panel doc-article">
+        <p class="eyebrow">Assignment 4 &middot; Option A &middot; June 12, 2026</p>
+        <h1>Developing an AI-Assisted Application</h1>
+        <p><strong>Student:</strong> Lizihan<br><strong>Project:</strong> Defend Your Thesis<br><strong>Application:</strong> <a href="thesis-defense.html">Play the browser game</a></p>
 
-                <h2 id="requirements">2. Requirement Mapping</h2>
-                <table>
-                    <thead><tr><th>Requirement</th><th>Implementation</th></tr></thead>
-                    <tbody>
-                        <tr><td>Functional software</td><td>Playable browser application</td></tr>
-                        <tr><td>Character selection</td><td>Analyst, Hacker, and Writer with distinct statistics</td></tr>
-                        <tr><td>Game over and score</td><td>Score, wave, result, restart, and persistent best score</td></tr>
-                        <tr><td>Keyboard and mouse</td><td>WASD/arrows, pointer aim, click/space fire, P pause</td></tr>
-                        <tr><td>Mobile access</td><td>Touch direction pad and auto-aim CITE button</td></tr>
-                        <tr><td>AI-assisted development</td><td>Architecture and debugging documented below</td></tr>
-                    </tbody>
-                </table>
+        <h2 id="summary">1. Project Summary</h2>
+        <p>Defend Your Thesis is an original room-based, top-down roguelite shooter built with HTML, CSS, JavaScript, and the Canvas 2D API. The player clears academic combat rooms, opens evidence chests, collects weapons of five qualities, and defeats a boss committee at the end of each floor.</p>
+        <p>The structure is inspired by broad room-based action-roguelite conventions, including games such as <em>Soul Knight</em>. All code, interface text, graphics, enemies, weapon names, balance values, and academic theming are original for this assignment.</p>
 
-                <h2 id="gameplay">3. Gameplay</h2>
-                <p>The player selects a candidate, moves around the arena, fires citations, protects thesis integrity, builds a combo, collects power-ups, and survives progressively harder waves. After every cleared wave, a three-choice research draft lets the player shape a different build.</p>
-                <table>
-                    <thead><tr><th>Character</th><th>Strength</th><th>Trade-off</th></tr></thead>
-                    <tbody>
-                        <tr><td>Analyst</td><td>Balanced statistics</td><td>No extreme advantage</td></tr>
-                        <tr><td>Hacker</td><td>Fast movement and fire</td><td>Low damage per shot</td></tr>
-                        <tr><td>Writer</td><td>High citation damage</td><td>Slow movement and fire</td></tr>
-                    </tbody>
-                </table>
-                <h3>Active abilities</h3>
-                <p>The Analyst freezes every current enemy, the Hacker releases a radial Hotfix Pulse, and the Writer starts a temporary Citation Storm. Every character can also dash with <code>Shift</code> to reposition and briefly avoid boss projectiles.</p>
-                <h3>Research upgrades</h3>
-                <p>The upgrade pool includes damage, fire rate, multi-shot, piercing, critical chance, movement, cooldown reduction, armor, renewable thesis shields, automatic repair, projectile velocity, and orbiting research assistants.</p>
-                <h3>Special enemies</h3>
-                <p>Replicators split on death, Paywalls protect their health with a shield, Reviewer #2 follows a curved approach, and the Committee Chair appears every fifth wave with ranged volleys and summoned threats.</p>
+        <h2 id="requirements">2. Requirement Mapping</h2>
+        <table>
+          <thead><tr><th>Requirement</th><th>Implementation</th></tr></thead>
+          <tbody>
+            <tr><td>Functional software</td><td>Stable GitHub Pages browser application</td></tr>
+            <tr><td>Character selection</td><td>Analyst, Hacker, and Writer with distinct statistics and skills</td></tr>
+            <tr><td>Game loop</td><td>Five-room floors, boss fight, score, game over, and restart</td></tr>
+            <tr><td>Keyboard and mouse</td><td>Movement, pointer aim, fire, pickup, swap, reload, dash, and skill</td></tr>
+            <tr><td>Mobile access</td><td>Touch controls and nearest-enemy auto-aim</td></tr>
+            <tr><td>AI-assisted development</td><td>Architecture, implementation, debugging, testing, and reflection documented below</td></tr>
+          </tbody>
+        </table>
 
-                <h2 id="architecture">4. Architecture</h2>
-                <pre>Input events
-    |
-Update player -> abilities -> drones -> projectiles
-    |
-Collisions -> score -> shield -> combo -> power-ups
-    |
-Wave manager -> upgrade draft -> next wave / boss
-    |
-Render arena -> entities -> effects -> boss bar -> HUD</pre>
-                <p>The game uses <code>requestAnimationFrame</code> and delta-time movement. A 0.033-second cap prevents large jumps after a browser tab returns from the background. Data objects define character and enemy balance separately from runtime logic.</p>
+        <h2 id="gameplay">3. Gameplay</h2>
+        <p>Every floor contains four standard research rooms and a boss chamber. The player defeats all enemies, opens an evidence chest, evaluates the dropped weapon, and enters the next portal. Solid obstacles create cover and require repositioning.</p>
 
-                <h2 id="ai">5. AI-Assisted Architecture</h2>
-                <p>An AI coding agent inspected the original static repository and helped convert the assignment brief into modules: character selection, Canvas engine, screen states, multi-input controls, wave management, collision detection, documentation, and tests.</p>
-                <p>A framework-free implementation was selected because the project has one game scene, no server state, and an existing GitHub Pages deployment. This reduced dependencies and kept the source easy to review.</p>
+        <h3>Weapon qualities and inventory</h3>
+        <table>
+          <thead><tr><th>Quality</th><th>Color</th><th>Effect</th></tr></thead>
+          <tbody>
+            <tr><td>Common</td><td>Gray</td><td>Base weapon statistics</td></tr>
+            <tr><td>Uncommon</td><td>Green</td><td>Improved damage and magazine</td></tr>
+            <tr><td>Rare</td><td>Blue</td><td>Stronger statistics</td></tr>
+            <tr><td>Epic</td><td>Purple</td><td>Large statistic increase</td></tr>
+            <tr><td>Legendary</td><td>Orange</td><td>Highest statistics and an extra trait</td></tr>
+          </tbody>
+        </table>
+        <p>The two-slot inventory supports pistols, SMGs, shotguns, railguns, lasers, launchers, and repeaters. Each weapon has its own magazine, reserve ammunition, reload time, firing delay, spread, projectile speed, piercing, or explosion behavior. Press <code>F</code> to pick up, <code>Q</code> to swap, and <code>R</code> to reload.</p>
 
-                <h2 id="problems">6. AI-Assisted Problem Solving</h2>
-                <h3>Collision detection</h3>
-                <p>Circle-based collision checks are used for bullets, enemies, the player, power-ups, and the thesis: <code>distance(a, b) &lt; radius(a) + radius(b)</code>.</p>
-                <h3>Input unification</h3>
-                <p>Keyboard and on-screen controls write to the same input state. Mouse and touch use the same firing logic, while keyboard and mobile skill buttons call the same ability and dash functions.</p>
-                <h3>Upgrade and enemy lifecycle</h3>
-                <p>The upgrade overlay pauses simulation without stopping rendering. Enemy IDs and reverse iteration keep collision handling stable when Replicators create new enemies. Boss projectiles use a separate collection because they obey different collision rules.</p>
-                <h3>Browser audio</h3>
-                <p>Web Audio is initialized only after the Begin Defense button is pressed, satisfying browser autoplay rules. Short synthesized tones avoid copyrighted assets and network downloads.</p>
+        <h3>Characters, enemies, and talents</h3>
+        <p>The Analyst has stronger weapon damage and can freeze threats. The Hacker moves faster and releases an EMP pulse. The Writer has more integrity and fires a radial Citation Storm. All characters can dash.</p>
+        <p>Enemy behaviors include fast pursuit, ranged fire, splitting, armor, projectile volleys, and boss summons. After defeating the Final Committee, the player chooses one permanent talent before entering a harder floor.</p>
 
-                <h2 id="tests">7. Testing</h2>
-                <table>
-                    <thead><tr><th>Test</th><th>Expected result</th></tr></thead>
-                    <tbody>
-                        <tr><td>Select each character</td><td>Visual selection and runtime statistics change</td></tr>
-                        <tr><td>Move in every direction</td><td>Player stays inside arena</td></tr>
-                        <tr><td>Fire at enemy</td><td>Health decreases and score increases on elimination</td></tr>
-                        <tr><td>Enemy reaches core</td><td>Thesis integrity decreases</td></tr>
-                        <tr><td>Integrity reaches zero</td><td>Game-over result appears</td></tr>
-                        <tr><td>Press P/Escape</td><td>Game pauses and resumes</td></tr>
-                        <tr><td>Clear wave</td><td>Three upgrade choices appear and simulation pauses</td></tr>
-                        <tr><td>Choose upgrade</td><td>Effect applies once and next wave begins</td></tr>
-                        <tr><td>Press E / Shift</td><td>Unique skill or dash activates and enters cooldown</td></tr>
-                        <tr><td>Destroy Replicator</td><td>Two smaller bugs spawn</td></tr>
-                        <tr><td>Reach wave 5</td><td>Committee Chair and boss health bar appear</td></tr>
-                        <tr><td>Wait during boss</td><td>Boss fires volleys and summons threats</td></tr>
-                        <tr><td>Collect power-up</td><td>Integrity or fire rate improves</td></tr>
-                        <tr><td>Finish run</td><td>Best score persists in local storage</td></tr>
-                    </tbody>
-                </table>
+        <h2 id="architecture">4. Architecture</h2>
+        <pre>Input
+  |
+Player movement -> weapon fire -> reload -> abilities
+  |
+Enemy movement -> projectiles -> boss summons
+  |
+Collisions -> damage -> drops -> score
+  |
+Room clear -> chest -> pickup -> portal -> talent
+  |
+Canvas render -> particles -> HUD -> overlays</pre>
+        <p>Data objects define weapon bases, five quality multipliers, characters, enemies, and talents separately from runtime state. The <code>requestAnimationFrame</code> loop uses capped delta time for refresh-rate-independent movement.</p>
 
-                <h2 id="challenges">8. Challenges</h2>
-                <p>Character and upgrade balance is stored as data so it can be tuned without rewriting game logic. Mobile input required auto-aim and dedicated skill buttons. Readability is supported through color, shape, labels, shields, health bars, a boss bar, particles, screen shake, and sound.</p>
+        <h2 id="ai">5. AI-Assisted Architecture</h2>
+        <p>An AI coding agent inspected the existing static repository and helped turn the assignment brief into a framework-free Canvas application compatible with GitHub Pages. It helped design the data-driven loot model, state transitions, collision system, shared desktop/mobile actions, documentation, and browser tests.</p>
+        <p>A framework was intentionally avoided because the project has one Canvas scene, no server state, and no need for a build system.</p>
 
-                <h2 id="limitations">9. Limitations</h2>
-                <ul>
-                    <li>The game currently contains one arena.</li>
-                    <li>Difficulty needs broader user playtesting.</li>
-                    <li>Best scores remain local to one browser.</li>
-                </ul>
+        <h2 id="problems">6. AI-Assisted Problem Solving</h2>
+        <h3>Weapon generation</h3>
+        <p>A weapon is generated by combining one base definition with one quality multiplier. This avoids duplicating every weapon five times and keeps balancing centralized.</p>
+        <h3>Inventory replacement</h3>
+        <p>New weapons fill an empty slot first. With two full slots, the new weapon replaces the active one and leaves the old weapon on the floor, allowing the player to reverse the choice.</p>
+        <h3>Collision and lifecycle</h3>
+        <p>Circle-against-rectangle collision keeps players and enemies outside solid props. Axis-by-axis movement supports sliding along edges. Reverse array iteration and copied enemy lists keep removal, splitting, explosions, and area skills stable.</p>
+        <h3>Originality</h3>
+        <p>The requested reference was treated as a genre and control direction, not as a request to copy copyrighted assets or exact presentation. The result uses original geometric graphics and an academic research theme.</p>
 
-                <h2 id="reflection">10. Reflection</h2>
-                <p>The AI agent was most useful for translating requirements into a testable architecture and checking edge cases across game states. Human judgment was still necessary for scope, visual style, honest documentation, and deciding whether each feature improved the product.</p>
-                <p>The result goes beyond an isolated prompt: it has explicit requirements, persistent state, input handling, collision rules, time-based movement, responsive controls, documentation, and a repeatable test plan.</p>
-                <p><a class="button button-primary" href="thesis-defense.html">Play Defend Your Thesis →</a> <a class="button button-secondary" href="https://github.com/lizihanFly/lizihanFly.github.io/blob/main/assignment4-report.md" target="_blank" rel="noreferrer">View Markdown</a></p>
-            </article>
-            <aside class="panel doc-nav">
-                <h3>On this page</h3>
-                <a href="#summary">Project summary</a><a href="#requirements">Requirements</a><a href="#gameplay">Gameplay</a><a href="#architecture">Architecture</a><a href="#ai">AI architecture</a><a href="#problems">Problem solving</a><a href="#tests">Testing</a><a href="#challenges">Challenges</a><a href="#limitations">Limitations</a><a href="#reflection">Reflection</a>
-            </aside>
-        </div>
-    </main>
+        <h2 id="tests">7. Testing</h2>
+        <table>
+          <thead><tr><th>Test</th><th>Expected result</th></tr></thead>
+          <tbody>
+            <tr><td>Start and move</td><td>Selected researcher enters room and respects walls</td></tr>
+            <tr><td>Fire and reload</td><td>Magazine and reserve update correctly</td></tr>
+            <tr><td>Clear room</td><td>Chest and portal appear</td></tr>
+            <tr><td>Open chest</td><td>Random-quality weapon and supplies appear</td></tr>
+            <tr><td>Pick up and swap</td><td>Two-slot inventory and active HUD update</td></tr>
+            <tr><td>Use skill or dash</td><td>Action applies and cooldown begins</td></tr>
+            <tr><td>Defeat room-five boss</td><td>Talent choice appears before next floor</td></tr>
+            <tr><td>Reach zero integrity</td><td>Game-over statistics and restart appear</td></tr>
+            <tr><td>Automated Chrome run</td><td>Movement, firing, ammunition, score, health, and console remain valid</td></tr>
+          </tbody>
+        </table>
+        <p>Static verification includes <code>node --check thesis-defense.js</code>, <code>git diff --check</code>, a headless Chrome page load, and automated Chrome input. Desktop and responsive layouts are also reviewed through screenshots.</p>
+
+        <h2 id="challenges">8. Challenges</h2>
+        <p>Combat readability requires five loot colors, distinct enemy silhouettes, health bars, a boss bar, particles, and restrained screen shake. Balance values are centralized so fire rate, damage, magazines, health, speed, and drop rates can be tuned after playtesting.</p>
+
+        <h2 id="limitations">9. Limitations</h2>
+        <ul>
+          <li>Balance is based on developer playtesting rather than a large player sample.</li>
+          <li>Best scores remain local to one browser.</li>
+          <li>Future work could add shops, weapon comparison panels, more bosses, controller support, and sound settings.</li>
+        </ul>
+
+        <h2 id="reflection">10. Reflection</h2>
+        <p>The AI agent accelerated architecture, implementation, and verification, but human judgment remained necessary for scope, originality, visual style, balance, and honest documentation. The final application now includes room progression, loot generation, inventory decisions, reloading, collision-aware layouts, bosses, permanent upgrades, responsive controls, persistence, and repeatable tests.</p>
+        <p><a class="button button-primary" href="thesis-defense.html">Play Defend Your Thesis &rarr;</a> <a class="button button-secondary" href="https://github.com/lizihanFly/lizihanFly.github.io/blob/main/assignment4-report.md" target="_blank" rel="noreferrer">View Markdown</a></p>
+      </article>
+
+      <aside class="panel doc-nav">
+        <h3>On this page</h3>
+        <a href="#summary">Project summary</a>
+        <a href="#requirements">Requirements</a>
+        <a href="#gameplay">Gameplay</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#ai">AI architecture</a>
+        <a href="#problems">Problem solving</a>
+        <a href="#tests">Testing</a>
+        <a href="#challenges">Challenges</a>
+        <a href="#limitations">Limitations</a>
+        <a href="#reflection">Reflection</a>
+      </aside>
+    </div>
+  </main>
 </body>
 </html>
