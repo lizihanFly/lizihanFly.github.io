@@ -79,6 +79,11 @@
               </div>
             </div>
 
+            <div class="pet-hud" id="pet-hud">
+              <span>Pets</span>
+              <div id="pet-hud-list"><small>No pets</small></div>
+            </div>
+
             <div class="ability-stack">
               <div class="ability-hud">
                 <div class="ability-key">E</div>
@@ -123,7 +128,10 @@
                   <span>Health +25%</span>
                 </button>
               </div>
-              <button class="primary-button" id="start-button" type="button">Enter Dungeon</button>
+              <div class="start-actions">
+                <button class="primary-button" id="start-button" type="button">Enter Dungeon</button>
+                <button class="secondary-game-button" id="start-fullscreen-button" type="button">Play Fullscreen</button>
+              </div>
               <p class="control-note">Move: WASD &middot; Fire: click / space &middot; Melee: right click / X &middot; Pick up: F &middot; Swap: Q &middot; Reload: R &middot; Fullscreen: G</p>
             </div>
           </div>
@@ -133,6 +141,21 @@
               <p class="eyebrow">Peer Review Passed</p>
               <h2>Choose one permanent research upgrade</h2>
               <div class="upgrade-grid" id="upgrade-grid"></div>
+            </div>
+          </div>
+
+          <div class="game-overlay pet-shop-screen" id="pet-shop-screen" hidden>
+            <div class="overlay-card pet-shop-card">
+              <div class="shop-heading">
+                <div>
+                  <p class="eyebrow">Research Companion Lab</p>
+                  <h2>Buy and upgrade pets</h2>
+                </div>
+                <div class="shop-wallet"><span>Funding</span><strong id="shop-coin-value">0</strong></div>
+              </div>
+              <p class="shop-note">Every pet joins the run permanently. Maximum level: 5.</p>
+              <div class="pet-shop-grid" id="pet-shop-grid"></div>
+              <button class="primary-button" id="shop-continue-button" type="button">Continue</button>
             </div>
           </div>
 
@@ -156,6 +179,20 @@
               </div>
               <p id="game-over-message">Rebuild the argument and try again.</p>
               <button class="primary-button" id="restart-button" type="button">Start Revision</button>
+            </div>
+          </div>
+
+          <div class="game-overlay finale-screen" id="finale-screen" hidden>
+            <div class="overlay-card compact-card finale-card">
+              <p class="eyebrow">Floor 100 Complete</p>
+              <h2>The thesis has exploded.</h2>
+              <p>After surviving one hundred floors, the accumulated research energy shattered the final thesis into pieces.</p>
+              <div class="result-grid">
+                <div><span>Floors</span><strong>100</strong></div>
+                <div><span>Rooms</span><strong>500</strong></div>
+                <div><span>Score</span><strong id="finale-score">0</strong></div>
+              </div>
+              <button class="primary-button" id="finale-restart-button" type="button">Write a New Thesis</button>
             </div>
           </div>
 
@@ -198,7 +235,7 @@
         <article>
           <span>01</span>
           <h3>Room-Based Combat</h3>
-          <p>Clear four research rooms and defeat a boss committee on room five. New floors increase enemy speed, health, and attack patterns.</p>
+          <p>Climb 100 floors with five rooms per floor. Floor 100 ends with the thesis exploding into fragments.</p>
         </article>
         <article>
           <span>02</span>
@@ -207,8 +244,8 @@
         </article>
         <article>
           <span>03</span>
-          <h3>Original Academic Theme</h3>
-          <p>The mechanics draw on modern room-based roguelites while all visuals, enemies, text, systems, and assets are original for this course project.</p>
+          <h3>Pet Companion Lab</h3>
+          <p>Spend Funding after every room to buy and upgrade ten combat, healing, defense, and support pets.</p>
         </article>
       </section>
     </main>

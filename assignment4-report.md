@@ -42,14 +42,17 @@ The application uses HTML, CSS, JavaScript, and the Canvas 2D API. It is hosted 
 2. Enter a research room and defeat all threats.
 3. Open the evidence chest.
 4. Inspect and pick up the generated weapon.
-5. Use the portal to enter the next room.
-6. Defeat the Final Committee in room five.
-7. Choose one permanent research talent.
-8. Continue to a harder floor with the current loadout.
+5. Use Funding in the pet shop to buy or upgrade companions.
+6. Enter the next room.
+7. Defeat the Final Committee in room five.
+8. Choose one permanent research talent.
+9. Reach floor 100 and watch the final thesis explode.
 
 ### Room and floor progression
 
-Each floor contains five rooms. The first four use different obstacle layouts and increasingly large enemy groups. Room five contains a boss with projectile volleys and summoned enemies. Enemy health, speed, and damage increase on later floors.
+The game contains exactly 100 floors and five rooms per floor, for a total of 500 rooms. The first four rooms use different obstacle layouts and increasingly large enemy groups. Room five contains a boss with projectile volleys and summoned enemies. Enemy health, speed, and damage increase gradually without creating an unbounded endless mode.
+
+After the floor-100 boss, the exit triggers a scripted ending. The thesis document explodes immediately, secondary explosions cross the arena, and the paper breaks into animated fragments before the final result appears.
 
 Solid bookcases and lab equipment change movement and firing lines. Bullets collide with these obstacles, so the player must reposition rather than standing in one location.
 
@@ -129,6 +132,23 @@ Defeated enemies can drop integrity repair, ammunition, or research funding. Cle
 ### Permanent talents
 
 After every boss, the player chooses one of three random talents. Talents can improve damage, integrity, movement, reload speed, skill cooldown, armor, ammunition, or future loot quality.
+
+### Funding and pet shop
+
+Funding is earned from enemies, collectible drops, bosses, and room-clear rewards. After every cleared room, the portal opens the Research Companion Lab. Funding can purchase a new pet or upgrade an owned pet to a maximum of level 5.
+
+The ten pets are:
+
+- **Citation Drone:** shoots the nearest enemy.
+- **Coffee Bot:** periodically restores integrity.
+- **Shield Node:** reduces incoming damage.
+- **Ammo Carrier:** restores reserve ammunition.
+- **Tesla Orb:** chains lightning between enemies.
+- **Frost Wisp:** freezes enemies in an area.
+- **Bomb Buddy:** launches explosive projectiles.
+- **Magnet Cube:** attracts health, ammo, and Funding.
+- **Laser Eye:** fires a piercing beam.
+- **Thesis Guardian:** circles the player and performs close-range attacks.
 
 ## 4. Software Architecture
 
@@ -237,6 +257,11 @@ The requested direction was interpreted as a genre and control reference, not a 
 | Reach room five | Final Committee and boss health bar appear |
 | Defeat boss and use portal | Three permanent talent choices appear |
 | Choose a talent | Effect applies and the next floor starts |
+| Clear any room and use portal | Ten-pet shop opens with the current Funding total |
+| Buy a pet | Funding decreases and the pet joins the HUD and arena |
+| Upgrade a pet | Its level increases up to level 5 and its ability improves |
+| Reach floor 100, room 5 | Final boss can be defeated normally |
+| Use the final portal | Thesis explosion, paper fragments, and completion result appear |
 | Integrity reaches zero | Game-over result appears |
 | Finish a run | Best score is stored in `localStorage` |
 | Use mobile controls | All essential actions remain available |
@@ -268,7 +293,7 @@ Desktop players can aim independently with a mouse. Touch players receive auto-a
 
 - Balance is currently based on developer playtesting rather than a large player sample.
 - Best scores remain local to one browser.
-- Future versions could add shops, weapon comparison panels, more bosses, sound settings, controller support, and accessibility options.
+- Future versions could add weapon comparison panels, more boss designs, sound settings, controller support, and accessibility options.
 
 ## 10. Reflection
 

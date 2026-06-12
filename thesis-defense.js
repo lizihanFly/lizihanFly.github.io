@@ -10,6 +10,7 @@
   const ui = {
     startScreen: document.getElementById("start-screen"),
     startButton: document.getElementById("start-button"),
+    startFullscreenButton: document.getElementById("start-fullscreen-button"),
     characterCards: [...document.querySelectorAll(".character-card")],
     gameHud: document.getElementById("game-hud"),
     floor: document.getElementById("floor-value"),
@@ -32,6 +33,11 @@
     dashCooldown: document.getElementById("dash-cooldown"),
     upgradeScreen: document.getElementById("upgrade-screen"),
     upgradeGrid: document.getElementById("upgrade-grid"),
+    petShopScreen: document.getElementById("pet-shop-screen"),
+    petShopGrid: document.getElementById("pet-shop-grid"),
+    shopCoins: document.getElementById("shop-coin-value"),
+    shopContinue: document.getElementById("shop-continue-button"),
+    petHudList: document.getElementById("pet-hud-list"),
     pauseScreen: document.getElementById("pause-screen"),
     pauseButton: document.getElementById("pause-button"),
     fullscreenButton: document.getElementById("fullscreen-button"),
@@ -42,6 +48,9 @@
     bestScore: document.getElementById("best-score"),
     gameOverMessage: document.getElementById("game-over-message"),
     restartButton: document.getElementById("restart-button"),
+    finaleScreen: document.getElementById("finale-screen"),
+    finaleScore: document.getElementById("finale-score"),
+    finaleRestartButton: document.getElementById("finale-restart-button"),
     touchControls: document.getElementById("touch-controls"),
     touchInteract: document.getElementById("touch-interact"),
     touchSwap: document.getElementById("touch-swap"),
@@ -163,6 +172,52 @@
     } }
   ];
 
+  const petTypes = {
+    citationDrone: {
+      name: "Citation Drone", icon: "CD", color: "#64b5ff", cost: 8,
+      text: "Fires citations at the nearest enemy."
+    },
+    coffeeBot: {
+      name: "Coffee Bot", icon: "CB", color: "#c88b56", cost: 10,
+      text: "Periodically restores thesis integrity."
+    },
+    shieldNode: {
+      name: "Shield Node", icon: "SN", color: "#70d9d0", cost: 12,
+      text: "Reduces incoming damage."
+    },
+    ammoMule: {
+      name: "Ammo Carrier", icon: "AC", color: "#719cff", cost: 10,
+      text: "Periodically restores reserve ammunition."
+    },
+    teslaOrb: {
+      name: "Tesla Orb", icon: "TO", color: "#65e7ff", cost: 14,
+      text: "Releases chain lightning between enemies."
+    },
+    frostWisp: {
+      name: "Frost Wisp", icon: "FW", color: "#8cdcff", cost: 12,
+      text: "Freezes nearby enemies in regular pulses."
+    },
+    bombBuddy: {
+      name: "Bomb Buddy", icon: "BB", color: "#ff8b62", cost: 15,
+      text: "Launches explosive projectiles."
+    },
+    magnetCube: {
+      name: "Magnet Cube", icon: "MC", color: "#e798ff", cost: 9,
+      text: "Pulls health, ammo, and Funding from farther away."
+    },
+    laserEye: {
+      name: "Laser Eye", icon: "LE", color: "#ff6f9e", cost: 16,
+      text: "Fires a piercing energy beam."
+    },
+    thesisGuardian: {
+      name: "Thesis Guardian", icon: "TG", color: "#ffd36d", cost: 14,
+      text: "Orbits close to the player and strikes enemies."
+    }
+  };
+
+  const MAX_FLOOR = 100;
+  const MAX_PET_LEVEL = 5;
+
   const roomNames = ["Literature Maze", "Method Lab", "Data Archive", "Revision Hall", "Committee Chamber"];
   const keys = Object.create(null);
   const touchKeys = { up: false, down: false, left: false, right: false };
@@ -171,6 +226,7 @@
   let lastTime = 0;
   let animationId = 0;
   let state = null;
+  let nativeFullscreenWasActive = false;
 
   function makeState() {
     const c = characters[selectedCharacter];
@@ -178,7 +234,10 @@
       running: true,
       paused: false,
       choosingTalent: false,
+      choosingShop: false,
       gameOver: false,
+      ending: false,
+      finaleComplete: false,
       floor: 1,
       room: 1,
       clearedRooms: 0,
@@ -194,6 +253,12 @@
       ammoMult: 1,
       armor: 0,
       luck: 0,
+      petLevels: {},
+      petEntities: [],
+      pendingTransition: null,
+      finaleTimer: 0,
+      finaleBurstTimer: 0,
+      thesisFragments: [],
       player: {
         x: 120, y: H / 2, radius: 17, angle: 0, color: c.color, speed: c.speed,
         invulnerable: 0, dashCooldown: 0, dashTime: 0, dashX: 0, dashY: 0,
@@ -244,6 +309,8 @@
     ui.gameOverScreen.hidden = true;
     ui.pauseScreen.hidden = true;
     ui.upgradeScreen.hidden = true;
+    ui.petShopScreen.hidden = true;
+    ui.finaleScreen.hidden = true;
     ui.gameHud.hidden = false;
     ui.touchControls.hidden = !isTouchDevice();
     ui.skillName.textContent = characters[selectedCharacter].skill;
@@ -270,7 +337,10 @@
     s.obstacles = roomData.obstacles;
     s.decorations = roomData.decorations;
     s.roomTheme = roomData.theme;
-    s.pendingSpawns = s.room === 5 ? Math.min(3 + s.floor, 8) : 3 + s.floor + s.room * 2;
+    const floorTier = Math.min(12, Math.floor((s.floor - 1) / 8));
+    s.pendingSpawns = s.room === 5
+      ? Math.min(10, 3 + Math.floor(s.floor / 15))
+      : 4 + floorTier + s.room * 2;
     s.spawnTimer = .25;
     if (s.room === 5) spawnEnemy("boss", W - 190, H / 2);
     showBanner(`Floor ${s.floor} / ${roomNames[s.room - 1]}`);
@@ -318,7 +388,8 @@
     if (!state || !state.running) return;
     const dt = Math.min((now - lastTime) / 1000, .034);
     lastTime = now;
-    if (!state.paused && !state.choosingTalent && !state.gameOver) update(dt);
+    if (state.ending && !state.finaleComplete) updateFinale(dt);
+    else if (!state.paused && !state.choosingTalent && !state.choosingShop && !state.gameOver) update(dt);
     draw();
     animationId = requestAnimationFrame(loop);
   }
@@ -330,6 +401,7 @@
     updateBullets(dt);
     updateEnemyBullets(dt);
     updatePickups(dt);
+    updatePets(dt);
     updateParticles(dt);
     updateEffects(dt);
     updateInteraction();
@@ -423,13 +495,13 @@
         y = edge < .75 ? 75 : H - 75;
       }
     }
-    const floorScale = 1 + (state.floor - 1) * .19 + (state.room - 1) * .035;
+    const floorScale = 1 + (state.floor - 1) * .035 + (state.room - 1) * .04;
     const sizeScale = miniature ? .65 : 1;
     const hp = type.hp * floorScale * (miniature ? .42 : 1);
     state.enemies.push({
       typeId, x, y, radius: type.radius * sizeScale, color: type.color,
-      hp, maxHp: hp, speed: type.speed * (1 + (state.floor - 1) * .045),
-      damage: type.damage * (1 + (state.floor - 1) * .12),
+      hp, maxHp: hp, speed: type.speed * Math.min(1.3, 1 + (state.floor - 1) * .003),
+      damage: type.damage * (1 + (state.floor - 1) * .012),
       score: Math.round(type.score * floorScale), armor: type.armor || 0,
       ranged: type.ranged, boss: type.boss, split: type.split && !miniature,
       preferredRange: type.preferredRange, projectileSpeed: type.projectileSpeed,
@@ -737,7 +809,15 @@
       const item = state.pickups[i];
       item.pulse += dt;
       if (item.type === "weapon") continue;
-      if (distance(item, state.player) > item.radius + state.player.radius + 5) continue;
+      const magnetLevel = state.petLevels.magnetCube || 0;
+      const collectRange = item.radius + state.player.radius + 5 + magnetLevel * 42;
+      const itemDistance = distance(item, state.player);
+      if (magnetLevel && itemDistance < collectRange * 1.8 && itemDistance > collectRange) {
+        const pull = 130 + magnetLevel * 35;
+        item.x += (state.player.x - item.x) / itemDistance * pull * dt;
+        item.y += (state.player.y - item.y) / itemDistance * pull * dt;
+      }
+      if (itemDistance > collectRange) continue;
       if (item.type === "health") {
         if (state.health >= state.maxHealth) continue;
         state.health = Math.min(state.maxHealth, state.health + item.amount);
@@ -758,6 +838,7 @@
     state.roomState = "cleared";
     state.clearedRooms++;
     state.score += 120 * state.floor * state.room;
+    state.coins += 4 + state.room * 2 + Math.floor(state.floor / 10);
     state.enemyBullets = [];
     const chestQuality = state.room === 5 ? "boss" : "normal";
     const chestPoint = findNearestOpenPoint(W / 2, H / 2, 38);
@@ -775,7 +856,11 @@
     }
     ui.prompt.hidden = false;
     if (target.type === "chest") ui.prompt.textContent = "F  Open evidence chest";
-    if (target.type === "portal") ui.prompt.textContent = state.room === 5 ? "F  Complete floor" : "F  Enter next room";
+    if (target.type === "portal") {
+      ui.prompt.textContent = state.floor === MAX_FLOOR && state.room === 5
+        ? "F  Finish the final thesis"
+        : "F  Open pet shop";
+    }
     if (target.type === "weapon") {
       const q = qualities[target.weapon.qualityId];
       ui.prompt.textContent = `F  Pick up ${q.name} ${target.weapon.name}`;
@@ -783,17 +868,17 @@
   }
 
   function interact() {
-    if (!state || state.paused || state.choosingTalent || state.gameOver) return;
+    if (!state || state.paused || state.choosingTalent || state.choosingShop || state.ending || state.gameOver) return;
     const target = nearestInteractable();
     if (!target) return;
     if (target.type === "chest") openChest(target);
     else if (target.type === "weapon") collectWeapon(target);
     else if (target.type === "portal") {
-      if (state.room < 5) {
-        state.room++;
-        startRoom();
+      if (state.floor === MAX_FLOOR && state.room === 5) {
+        startFinalExplosion();
       } else {
-        openTalentChoice();
+        state.pendingTransition = state.room < 5 ? "room" : "floor";
+        openPetShop();
       }
     }
   }
@@ -899,7 +984,7 @@
   }
 
   function useDash() {
-    if (!state || state.player.dashCooldown > 0 || state.paused || state.choosingTalent) return;
+    if (!state || state.player.dashCooldown > 0 || state.paused || state.choosingTalent || state.choosingShop || state.ending) return;
     let dx = (keys.KeyD || keys.ArrowRight || touchKeys.right ? 1 : 0) - (keys.KeyA || keys.ArrowLeft || touchKeys.left ? 1 : 0);
     let dy = (keys.KeyS || keys.ArrowDown || touchKeys.down ? 1 : 0) - (keys.KeyW || keys.ArrowUp || touchKeys.up ? 1 : 0);
     if (!dx && !dy) {
@@ -915,7 +1000,7 @@
   }
 
   function useSkill() {
-    if (!state || state.player.skillCooldown > 0 || state.paused || state.choosingTalent) return;
+    if (!state || state.player.skillCooldown > 0 || state.paused || state.choosingTalent || state.choosingShop || state.ending) return;
     const p = state.player;
     const c = characters[selectedCharacter];
     p.skillCooldown = c.skillCooldown * state.skillMult;
@@ -945,6 +1030,167 @@
     }
   }
 
+  function petUpgradeCost(id, level) {
+    const pet = petTypes[id];
+    return level === 0 ? pet.cost : pet.cost + level * 7;
+  }
+
+  function openPetShop() {
+    state.choosingShop = true;
+    pointer.down = false;
+    renderPetShop();
+    ui.petShopScreen.hidden = false;
+  }
+
+  function renderPetShop() {
+    ui.shopCoins.textContent = state.coins;
+    ui.petShopGrid.innerHTML = "";
+    Object.entries(petTypes).forEach(([id, pet]) => {
+      const level = state.petLevels[id] || 0;
+      const cost = petUpgradeCost(id, level);
+      const maxed = level >= MAX_PET_LEVEL;
+      const card = document.createElement("article");
+      card.className = `pet-card${level ? " owned" : ""}`;
+      card.style.setProperty("--pet-color", pet.color);
+      card.innerHTML = `
+        <span class="pet-card-icon">${pet.icon}</span>
+        <h3>${pet.name}</h3>
+        <span class="pet-level">${level ? `Level ${level} / ${MAX_PET_LEVEL}` : "Not owned"}</span>
+        <p>${pet.text}</p>
+        <button class="pet-buy-button" type="button" ${maxed || state.coins < cost ? "disabled" : ""}>
+          ${maxed ? "MAX LEVEL" : `${level ? "UPGRADE" : "BUY"} - ${cost}`}
+        </button>`;
+      const button = card.querySelector("button");
+      if (!maxed) button.addEventListener("click", () => buyOrUpgradePet(id));
+      ui.petShopGrid.appendChild(card);
+    });
+  }
+
+  function buyOrUpgradePet(id) {
+    const level = state.petLevels[id] || 0;
+    if (level >= MAX_PET_LEVEL) return;
+    const cost = petUpgradeCost(id, level);
+    if (state.coins < cost) return;
+    state.coins -= cost;
+    state.petLevels[id] = level + 1;
+    if (!level) {
+      state.petEntities.push({
+        id, x: state.player.x, y: state.player.y, timer: random(.2, 1),
+        pulse: 0, attackTimer: 0
+      });
+    }
+    showMessage(`${petTypes[id].name} ${level ? "upgraded" : "joined the research team"}.`);
+    renderPetShop();
+    updatePetHud();
+    updateHud();
+  }
+
+  function continueAfterPetShop() {
+    ui.petShopScreen.hidden = true;
+    state.choosingShop = false;
+    if (state.pendingTransition === "room") {
+      state.room++;
+      state.pendingTransition = null;
+      startRoom();
+    } else {
+      state.pendingTransition = null;
+      openTalentChoice();
+    }
+  }
+
+  function updatePets(dt) {
+    const count = state.petEntities.length;
+    state.petEntities.forEach((pet, index) => {
+      const level = state.petLevels[pet.id] || 1;
+      pet.timer -= dt;
+      pet.attackTimer = Math.max(0, pet.attackTimer - dt);
+      pet.pulse += dt;
+      const angle = performance.now() * .00055 + index / Math.max(1, count) * Math.PI * 2;
+      const radius = pet.id === "thesisGuardian" ? 45 : 66 + (index % 3) * 17;
+      const targetX = state.player.x + Math.cos(angle) * radius;
+      const targetY = state.player.y + Math.sin(angle) * radius * .68;
+      pet.x += (targetX - pet.x) * Math.min(1, dt * 5.5);
+      pet.y += (targetY - pet.y) * Math.min(1, dt * 5.5);
+
+      if (pet.id === "citationDrone" && pet.timer <= 0) {
+        const target = nearestEnemy(pet.x, pet.y);
+        if (target) petShoot(pet, target, 10 + level * 6, "#64b5ff", "carbine", 720);
+        pet.timer = Math.max(.38, 1.15 - level * .13);
+      } else if (pet.id === "coffeeBot" && pet.timer <= 0) {
+        if (state.health < state.maxHealth) {
+          state.health = Math.min(state.maxHealth, state.health + 3 + level * 3);
+          addParticle(state.player.x, state.player.y, "#c88b56", 12, 80);
+        }
+        pet.timer = Math.max(7, 18 - level * 2);
+      } else if (pet.id === "ammoMule" && pet.timer <= 0) {
+        state.inventory.filter(Boolean).forEach(w => {
+          w.reserve += Math.max(1, Math.ceil(w.mag * (.08 + level * .045)));
+        });
+        addParticle(pet.x, pet.y, "#719cff", 10, 75);
+        pet.timer = Math.max(6, 15 - level * 1.6);
+      } else if (pet.id === "teslaOrb" && pet.timer <= 0) {
+        petTeslaAttack(pet, level);
+        pet.timer = Math.max(.8, 2.3 - level * .22);
+      } else if (pet.id === "frostWisp" && pet.timer <= 0) {
+        const range = 150 + level * 22;
+        state.enemies.forEach(enemy => {
+          if (distance(pet, enemy) < range) enemy.frozen = Math.max(enemy.frozen, .55 + level * .18);
+        });
+        state.effects.push({ type: "ring", layer: "under", x: pet.x, y: pet.y, radius: 10, endRadius: range, lineWidth: 5, life: .45, maxLife: .45, color: "#8cdcff" });
+        pet.timer = Math.max(3.5, 7.2 - level * .55);
+      } else if (pet.id === "bombBuddy" && pet.timer <= 0) {
+        const target = nearestEnemy(pet.x, pet.y);
+        if (target) petShoot(pet, target, 14 + level * 7, "#ff8b62", "launcher", 390, 45 + level * 8);
+        pet.timer = Math.max(1.5, 4.2 - level * .42);
+      } else if (pet.id === "laserEye" && pet.timer <= 0) {
+        const target = nearestEnemy(pet.x, pet.y);
+        if (target) petShoot(pet, target, 13 + level * 8, "#ff6f9e", "railgun", 1000, 0, 2 + Math.floor(level / 2));
+        pet.timer = Math.max(.7, 2 - level * .2);
+      } else if (pet.id === "thesisGuardian") {
+        state.enemies.slice().forEach(enemy => {
+          if (pet.attackTimer <= 0 && distance(pet, enemy) < enemy.radius + 25) {
+            hitEnemy(enemy, 12 + level * 9);
+            addImpactEffect(enemy.x, enemy.y, "#ffd36d", "crossbow", true);
+            pet.attackTimer = Math.max(.25, .8 - level * .1);
+          }
+        });
+      }
+    });
+  }
+
+  function petShoot(pet, target, damage, color, model, speed, explosive = 0, pierce = 0) {
+    const angle = Math.atan2(target.y - pet.y, target.x - pet.x);
+    state.bullets.push({
+      x: pet.x, y: pet.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+      radius: model === "launcher" ? 6 : 3.5, damage, life: 2, pierce,
+      explosive, chain: 0, homing: model === "launcher" ? 2 : 0,
+      bounces: 0, grow: false, model, qualityId: "rare", color, hit: new Set()
+    });
+    state.effects.push({ type: "muzzle", layer: "over", x: pet.x, y: pet.y, rotation: angle, size: 9, life: .08, maxLife: .08, color, model });
+  }
+
+  function petTeslaAttack(pet, level) {
+    let current = nearestEnemy(pet.x, pet.y);
+    if (!current) return;
+    const hit = new Set();
+    let origin = pet;
+    for (let i = 0; i < Math.min(5, 1 + level); i++) {
+      if (!current) break;
+      hit.add(current);
+      drawLightningParticles(origin, current, "#65e7ff");
+      hitEnemy(current, 8 + level * 6);
+      origin = current;
+      let next = null;
+      let best = 155;
+      state.enemies.forEach(enemy => {
+        if (hit.has(enemy)) return;
+        const d = distance(origin, enemy);
+        if (d < best) { best = d; next = enemy; }
+      });
+      current = next;
+    }
+  }
+
   function openTalentChoice() {
     state.choosingTalent = true;
     ui.upgradeGrid.innerHTML = "";
@@ -970,12 +1216,120 @@
   function damagePlayer(amount) {
     const p = state.player;
     if (p.invulnerable > 0) return;
-    const actual = Math.max(1, Math.round(amount * (1 - state.armor)));
+    const shieldLevel = state.petLevels.shieldNode || 0;
+    const petReduction = Math.min(.25, shieldLevel * .05);
+    const actual = Math.max(1, Math.round(amount * (1 - state.armor) * (1 - petReduction)));
     state.health -= actual;
     p.invulnerable = .62;
     state.shake = 9;
     addParticle(p.x, p.y, "#ff657c", 12, 100);
     if (state.health <= 0) endGame();
+  }
+
+  function startFinalExplosion() {
+    state.ending = true;
+    state.finaleComplete = false;
+    state.finaleTimer = 4.2;
+    state.finaleBurstTimer = 0;
+    state.roomState = "finale";
+    state.enemies = [];
+    state.bullets = [];
+    state.enemyBullets = [];
+    state.pickups = [];
+    state.interactables = [];
+    state.thesisFragments = [];
+    ui.prompt.hidden = true;
+    pointer.down = false;
+    const centerX = W / 2;
+    const centerY = H / 2;
+    for (let i = 0; i < 85; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = random(90, 420);
+      state.thesisFragments.push({
+        x: centerX + random(-24, 24), y: centerY + random(-32, 32),
+        vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+        rotation: random(0, Math.PI * 2), spin: random(-10, 10),
+        w: random(5, 17), h: random(4, 12),
+        color: Math.random() < .2 ? "#ffcf77" : Math.random() < .5 ? "#f5f0e5" : "#d9e7ff"
+      });
+    }
+    createFinaleBurst(centerX, centerY, 1);
+    showBanner("THE THESIS IS EXPLODING");
+  }
+
+  function createFinaleBurst(x, y, scale) {
+    state.effects.push({
+      type: "ring", layer: "under", x, y, radius: 10,
+      endRadius: 210 * scale, lineWidth: 16 * scale,
+      life: .65, maxLife: .65, color: scale > .7 ? "#ff784f" : "#ffd56c"
+    });
+    state.effects.push({
+      type: "flash", layer: "over", x, y, radius: 150 * scale,
+      life: .25, maxLife: .25, color: "#fff6d0"
+    });
+    addParticle(x, y, scale > .7 ? "#ff7855" : "#ffd36d", Math.round(35 * scale), 360 * scale);
+    state.shake = Math.max(state.shake, 18 * scale);
+  }
+
+  function updateFinale(dt) {
+    state.finaleTimer -= dt;
+    state.finaleBurstTimer -= dt;
+    state.shake = Math.max(0, state.shake - dt * 18);
+    updateParticles(dt);
+    updateEffects(dt);
+    state.thesisFragments.forEach(fragment => {
+      fragment.x += fragment.vx * dt;
+      fragment.y += fragment.vy * dt;
+      fragment.vx *= .992;
+      fragment.vy = fragment.vy * .992 + 85 * dt;
+      fragment.rotation += fragment.spin * dt;
+    });
+    if (state.finaleBurstTimer <= 0 && state.finaleTimer > .8) {
+      createFinaleBurst(W / 2 + random(-115, 115), H / 2 + random(-85, 85), random(.35, .7));
+      state.finaleBurstTimer = random(.28, .48);
+    }
+    if (state.finaleTimer <= 0) {
+      state.finaleComplete = true;
+      state.gameOver = true;
+      ui.finaleScore.textContent = Math.round(state.score).toLocaleString();
+      ui.finaleScreen.hidden = false;
+      ui.touchControls.hidden = true;
+    }
+  }
+
+  function drawFinale() {
+    const flash = clamp(state.finaleTimer / 4.2, 0, 1);
+    ctx.fillStyle = `rgba(255, 89, 55, ${Math.max(0, (flash - .72) * 1.2)})`;
+    ctx.fillRect(0, 0, W, H);
+    state.thesisFragments.forEach(fragment => {
+      ctx.save();
+      ctx.translate(fragment.x, fragment.y);
+      ctx.rotate(fragment.rotation);
+      ctx.fillStyle = fragment.color;
+      ctx.shadowColor = fragment.color;
+      ctx.shadowBlur = 7;
+      ctx.fillRect(-fragment.w / 2, -fragment.h / 2, fragment.w, fragment.h);
+      if (fragment.w > 10) {
+        ctx.fillStyle = "rgba(45,55,76,.38)";
+        ctx.fillRect(-fragment.w * .3, -1, fragment.w * .6, 1);
+      }
+      ctx.restore();
+    });
+    if (state.finaleTimer > 3.65) {
+      ctx.save();
+      ctx.translate(W / 2, H / 2);
+      ctx.shadowColor = "#ffcf68";
+      ctx.shadowBlur = 60;
+      ctx.fillStyle = "#fff9e8";
+      roundRect(-70, -92, 140, 184, 8); ctx.fill();
+      ctx.fillStyle = "#394259";
+      for (let y = -58; y < 65; y += 18) ctx.fillRect(-43, y, 86, 4);
+      ctx.fillStyle = "#9a6ad3";
+      ctx.font = "800 15px Manrope";
+      ctx.textAlign = "center";
+      ctx.fillText("THESIS", 0, -72);
+      ctx.restore();
+    }
   }
 
   function endGame() {
@@ -1242,8 +1596,17 @@
     ctx.save();
     if (state.shake > 0) ctx.translate(random(-state.shake, state.shake), random(-state.shake, state.shake));
     drawRoom();
+    if (state.ending) {
+      drawFinale();
+      drawParticles();
+      drawEffects("under");
+      drawEffects("over");
+      ctx.restore();
+      return;
+    }
     drawInteractables();
     drawPickups();
+    drawPets();
     drawParticles();
     drawEffects("under");
     state.bullets.forEach(drawBullet);
@@ -1489,6 +1852,60 @@
       if (p.muzzleFlash > 0) drawPlayerMuzzleFlash(weapon, p.muzzleFlash, p.barrelHeat);
     }
     ctx.restore();
+  }
+
+  function drawPets() {
+    state.petEntities.forEach(pet => {
+      const data = petTypes[pet.id];
+      const level = state.petLevels[pet.id] || 1;
+      const pulse = 1 + Math.sin(pet.pulse * 4) * .08;
+      ctx.save();
+      ctx.translate(pet.x, pet.y);
+      ctx.scale(pulse, pulse);
+      ctx.shadowColor = data.color;
+      ctx.shadowBlur = 14 + level * 2;
+      ctx.fillStyle = data.color;
+      if (pet.id === "citationDrone") {
+        roundRect(-13, -8, 26, 16, 5); ctx.fill();
+        ctx.fillStyle = "#eaf6ff"; ctx.fillRect(8, -2, 12, 4);
+      } else if (pet.id === "coffeeBot") {
+        roundRect(-10, -12, 20, 23, 5); ctx.fill();
+        ctx.strokeStyle = data.color; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(10, -3, 7, -1.2, 1.2); ctx.stroke();
+        ctx.fillStyle = "#fff2dc"; ctx.fillRect(-6, -7, 12, 3);
+      } else if (pet.id === "shieldNode") {
+        polygon(0, 0, 15, 6); ctx.fill();
+        ctx.strokeStyle = "#dffffc"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 20, 0, Math.PI * 2); ctx.stroke();
+      } else if (pet.id === "ammoMule") {
+        roundRect(-13, -10, 26, 20, 5); ctx.fill();
+        ctx.fillStyle = "#dce8ff"; ctx.fillRect(-7, -6, 4, 12); ctx.fillRect(2, -6, 4, 12);
+      } else if (pet.id === "teslaOrb") {
+        ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "#e9fdff"; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(0, 0, 17, pet.pulse, pet.pulse + Math.PI * 1.4); ctx.stroke();
+      } else if (pet.id === "frostWisp") {
+        ctx.beginPath(); ctx.moveTo(0, -15); ctx.lineTo(12, 8); ctx.lineTo(0, 14); ctx.lineTo(-12, 8); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = "#eaffff"; ctx.beginPath(); ctx.arc(0, 1, 4, 0, Math.PI * 2); ctx.fill();
+      } else if (pet.id === "bombBuddy") {
+        ctx.beginPath(); ctx.arc(0, 2, 13, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "#ffe4ba"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(5, -10); ctx.quadraticCurveTo(10, -20, 16, -15); ctx.stroke();
+      } else if (pet.id === "magnetCube") {
+        ctx.rotate(pet.pulse * .6); ctx.fillRect(-11, -11, 22, 22);
+        ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.strokeRect(-6, -6, 12, 12);
+      } else if (pet.id === "laserEye") {
+        ctx.beginPath(); ctx.ellipse(0, 0, 16, 10, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(3, 0, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#54152c"; ctx.beginPath(); ctx.arc(4, 0, 2, 0, Math.PI * 2); ctx.fill();
+      } else {
+        polygon(0, 0, 16, 4); ctx.fill();
+        ctx.strokeStyle = "#fff4c5"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-8, 8); ctx.lineTo(9, -9); ctx.stroke();
+      }
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "#fff";
+      ctx.font = "800 7px DM Sans";
+      ctx.textAlign = "center";
+      ctx.fillText(level, 0, 3);
+      ctx.restore();
+    });
   }
 
   function drawWeaponModel(weapon, qualityColor) {
@@ -1933,7 +2350,7 @@
 
   function updateHud() {
     if (!state) return;
-    ui.floor.textContent = state.floor;
+    ui.floor.textContent = `${state.floor}/${MAX_FLOOR}`;
     ui.room.textContent = `${state.room}/5`;
     ui.score.textContent = Math.round(state.score).toLocaleString();
     ui.coins.textContent = state.coins;
@@ -1977,31 +2394,63 @@
     const dashRatio = 1 - state.player.dashCooldown / 2.15;
     ui.dashFill.style.width = `${clamp(dashRatio, 0, 1) * 100}%`;
     ui.dashCooldown.textContent = state.player.dashCooldown > 0 ? state.player.dashCooldown.toFixed(1) : "READY";
+    updatePetHud();
+    if (state.choosingShop) ui.shopCoins.textContent = state.coins;
+  }
+
+  function updatePetHud() {
+    if (!state) return;
+    const owned = Object.entries(state.petLevels).filter(([, level]) => level > 0);
+    if (!owned.length) {
+      ui.petHudList.innerHTML = "<small>No pets</small>";
+      return;
+    }
+    ui.petHudList.innerHTML = owned.map(([id, level]) => {
+      const pet = petTypes[id];
+      return `<span class="pet-hud-badge" style="color:${pet.color}">${pet.icon} ${level}</span>`;
+    }).join("");
   }
 
   function togglePause(force) {
-    if (!state || state.gameOver || state.choosingTalent) return;
+    if (!state || state.gameOver || state.choosingTalent || state.choosingShop || state.ending) return;
     state.paused = force === undefined ? !state.paused : force;
     ui.pauseScreen.hidden = !state.paused;
     if (state.paused) pointer.down = false;
   }
 
+  function setExpandedMode(active) {
+    canvasWrap.classList.toggle("expanded", active);
+    document.documentElement.classList.toggle("game-expanded", active);
+    document.body.classList.toggle("game-expanded", active);
+    updateFullscreenButton();
+  }
+
   async function toggleFullscreen() {
+    const nativeActive = document.fullscreenElement === canvasWrap || document.webkitFullscreenElement === canvasWrap;
+    const expanded = canvasWrap.classList.contains("expanded");
     try {
-      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        const request = canvasWrap.requestFullscreen || canvasWrap.webkitRequestFullscreen;
-        if (request) await request.call(canvasWrap);
-      } else {
+      if (nativeActive) {
         const exit = document.exitFullscreen || document.webkitExitFullscreen;
         if (exit) await exit.call(document);
+        return;
       }
+      if (expanded) {
+        setExpandedMode(false);
+        return;
+      }
+      setExpandedMode(true);
+      const request = canvasWrap.requestFullscreen || canvasWrap.webkitRequestFullscreen;
+      if (request) await request.call(canvasWrap);
     } catch (error) {
-      console.warn("Fullscreen is not available in this browser.", error);
+      console.warn("Native fullscreen is unavailable; using expanded browser mode.", error);
+      setExpandedMode(true);
     }
   }
 
   function updateFullscreenButton() {
-    const active = document.fullscreenElement === canvasWrap || document.webkitFullscreenElement === canvasWrap;
+    const active = document.fullscreenElement === canvasWrap
+      || document.webkitFullscreenElement === canvasWrap
+      || canvasWrap.classList.contains("expanded");
     ui.fullscreenButton.textContent = active ? "EXIT" : "FULL";
     ui.fullscreenButton.setAttribute("aria-label", active ? "Exit fullscreen" : "Enter fullscreen");
   }
@@ -2018,7 +2467,13 @@
     });
   });
   ui.startButton.addEventListener("click", startGame);
+  ui.startFullscreenButton.addEventListener("click", async () => {
+    await toggleFullscreen();
+    startGame();
+  });
   ui.restartButton.addEventListener("click", startGame);
+  ui.finaleRestartButton.addEventListener("click", startGame);
+  ui.shopContinue.addEventListener("click", continueAfterPetShop);
   ui.pauseButton.addEventListener("click", () => togglePause());
   ui.fullscreenButton.addEventListener("click", toggleFullscreen);
   ui.resumeButton.addEventListener("click", () => togglePause(false));
@@ -2028,7 +2483,11 @@
     keys[event.code] = true;
     if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.code)) event.preventDefault();
     if (event.repeat && ["KeyF", "KeyG", "KeyQ", "KeyR", "KeyE", "KeyX", "ShiftLeft", "ShiftRight"].includes(event.code)) return;
-    if (event.code === "Escape") togglePause();
+    if (event.code === "Escape") {
+      const nativeActive = document.fullscreenElement || document.webkitFullscreenElement;
+      if (canvasWrap.classList.contains("expanded") && !nativeActive) setExpandedMode(false);
+      else togglePause();
+    }
     if (event.code === "KeyF") interact();
     if (event.code === "KeyG") toggleFullscreen();
     if (event.code === "KeyQ") cycleWeapon();
@@ -2044,8 +2503,20 @@
     pointer.down = false;
     Object.keys(keys).forEach(k => { keys[k] = false; });
   });
-  document.addEventListener("fullscreenchange", updateFullscreenButton);
-  document.addEventListener("webkitfullscreenchange", updateFullscreenButton);
+  function handleFullscreenChange() {
+    const active = document.fullscreenElement === canvasWrap || document.webkitFullscreenElement === canvasWrap;
+    if (active) {
+      nativeFullscreenWasActive = true;
+      setExpandedMode(true);
+    } else if (nativeFullscreenWasActive) {
+      nativeFullscreenWasActive = false;
+      setExpandedMode(false);
+    } else {
+      updateFullscreenButton();
+    }
+  }
+  document.addEventListener("fullscreenchange", handleFullscreenChange);
+  document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
 
   canvas.addEventListener("pointermove", event => {
     const p = canvasPoint(event);
@@ -2123,6 +2594,35 @@
       if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
     }
     ctx.closePath();
+  }
+
+  if (location.protocol === "file:") {
+    window.__thesisTest = {
+      openPetShop() {
+        if (!state) startGame();
+        state.coins = 120;
+        state.pendingTransition = "room";
+        openPetShop();
+      },
+      startFinale() {
+        if (!state) startGame();
+        state.floor = MAX_FLOOR;
+        state.room = 5;
+        startFinalExplosion();
+      },
+      addAllPets(level = 1) {
+        if (!state) startGame();
+        state.petEntities = [];
+        Object.keys(petTypes).forEach(id => {
+          state.petLevels[id] = clamp(level, 1, MAX_PET_LEVEL);
+          state.petEntities.push({
+            id, x: state.player.x, y: state.player.y,
+            timer: random(.1, .5), pulse: 0, attackTimer: 0
+          });
+        });
+        updatePetHud();
+      }
+    };
   }
 
   drawBackdrop();

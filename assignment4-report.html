@@ -40,7 +40,7 @@
           <tbody>
             <tr><td>Functional software</td><td>Stable GitHub Pages browser application</td></tr>
             <tr><td>Character selection</td><td>Analyst, Hacker, and Writer with distinct statistics and skills</td></tr>
-            <tr><td>Game loop</td><td>Five-room floors, boss fight, score, game over, and restart</td></tr>
+            <tr><td>Game loop</td><td>100 floors, five rooms per floor, bosses, pet shops, final ending, and restart</td></tr>
             <tr><td>Keyboard and mouse</td><td>Movement, pointer aim, fire, pickup, swap, reload, dash, and skill</td></tr>
             <tr><td>Mobile access</td><td>Touch controls and nearest-enemy auto-aim</td></tr>
             <tr><td>Fullscreen presentation</td><td>Fullscreen button and <code>G</code> shortcut with aspect-ratio preservation</td></tr>
@@ -49,7 +49,8 @@
         </table>
 
         <h2 id="gameplay">3. Gameplay</h2>
-        <p>Every floor contains four standard research rooms and a boss chamber. The player defeats all enemies, opens an evidence chest, evaluates the dropped weapon, and enters the next portal. Ten standard layouts, three boss layouts, and four visual themes use modeled bookshelves, desks, server racks, laboratory vats, and pillars instead of identical blocks.</p>
+        <p>The game contains exactly 100 floors and five rooms per floor, for 500 rooms in total. Every floor contains four standard research rooms and a boss chamber. Ten standard layouts, three boss layouts, and four visual themes use modeled bookshelves, desks, server racks, laboratory vats, and pillars.</p>
+        <p>After the floor-100 boss, the final portal triggers a scripted ending: the thesis explodes, secondary blasts cross the arena, and the document breaks into animated paper fragments.</p>
 
         <h3>Weapon qualities and inventory</h3>
         <table>
@@ -71,6 +72,9 @@
         <h3>Characters, enemies, and talents</h3>
         <p>The Analyst has stronger weapon damage and can freeze threats. The Hacker moves faster and releases an EMP pulse. The Writer has more integrity and fires a radial Citation Storm. All characters can dash.</p>
         <p>Eight enemy types include fast pursuit, long-range sniping, ranged fire, splitting, armor, projectile volleys, and boss summons. After defeating the Final Committee, the player chooses one permanent talent before entering a harder floor.</p>
+        <h3>Funding and pets</h3>
+        <p>Funding now has a direct gameplay purpose. After every room, the Research Companion Lab lets the player buy and upgrade pets to level 5. The ten pets are Citation Drone, Coffee Bot, Shield Node, Ammo Carrier, Tesla Orb, Frost Wisp, Bomb Buddy, Magnet Cube, Laser Eye, and Thesis Guardian.</p>
+        <p>Pets provide shooting, healing, damage reduction, ammunition, chain lightning, freezing, explosions, item attraction, piercing lasers, and close-range protection.</p>
 
         <h2 id="architecture">4. Architecture</h2>
         <pre>Input
@@ -113,6 +117,9 @@ Canvas render -> particles -> HUD -> overlays</pre>
             <tr><td>Pick up and swap</td><td>Two-slot inventory and active HUD update</td></tr>
             <tr><td>Use skill or dash</td><td>Action applies and cooldown begins</td></tr>
             <tr><td>Defeat room-five boss</td><td>Talent choice appears before next floor</td></tr>
+            <tr><td>Use portal after a room</td><td>Ten-pet shop opens and shows current Funding</td></tr>
+            <tr><td>Buy or upgrade pet</td><td>Funding decreases and pet level/ability updates</td></tr>
+            <tr><td>Complete floor 100</td><td>Thesis explosion and 500-room completion result appear</td></tr>
             <tr><td>Reach zero integrity</td><td>Game-over statistics and restart appear</td></tr>
             <tr><td>Automated Chrome run</td><td>Movement, firing, ammunition, score, health, and console remain valid</td></tr>
           </tbody>
@@ -126,7 +133,7 @@ Canvas render -> particles -> HUD -> overlays</pre>
         <ul>
           <li>Balance is based on developer playtesting rather than a large player sample.</li>
           <li>Best scores remain local to one browser.</li>
-          <li>Future work could add shops, weapon comparison panels, more bosses, controller support, and sound settings.</li>
+          <li>Future work could add weapon comparison panels, more bosses, controller support, and sound settings.</li>
         </ul>
 
         <h2 id="reflection">10. Reflection</h2>
