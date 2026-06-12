@@ -48,7 +48,7 @@
         </table>
 
         <h2 id="gameplay">3. Gameplay</h2>
-        <p>Every floor contains four standard research rooms and a boss chamber. The player defeats all enemies, opens an evidence chest, evaluates the dropped weapon, and enters the next portal. Solid obstacles create cover and require repositioning.</p>
+        <p>Every floor contains four standard research rooms and a boss chamber. The player defeats all enemies, opens an evidence chest, evaluates the dropped weapon, and enters the next portal. Ten standard layouts, three boss layouts, and four visual themes use modeled bookshelves, desks, server racks, laboratory vats, and pillars instead of identical blocks.</p>
 
         <h3>Weapon qualities and inventory</h3>
         <table>
@@ -61,11 +61,12 @@
             <tr><td>Legendary</td><td>Orange</td><td>Highest statistics and an extra trait</td></tr>
           </tbody>
         </table>
-        <p>The two-slot inventory supports pistols, SMGs, shotguns, railguns, lasers, launchers, and repeaters. Each weapon has its own magazine, reserve ammunition, reload time, firing delay, spread, projectile speed, piercing, or explosion behavior. Press <code>F</code> to pick up, <code>Q</code> to swap, and <code>R</code> to reload.</p>
+        <p>The two-slot inventory supports fifteen weapons with distinct Canvas silhouettes. Behaviors include spread fire, piercing, explosions, homing, chain lightning, expanding flame, and ricochet projectiles. Each weapon has its own magazine, reserve ammunition, reload time, firing delay, spread, and projectile speed. Press <code>F</code> to pick up, <code>Q</code> to swap, and <code>R</code> to reload.</p>
+        <p>Right click or <code>X</code> performs a close-range melee strike that can damage enemies and remove hostile projectiles. Firing an empty weapon automatically uses this strike while reloading.</p>
 
         <h3>Characters, enemies, and talents</h3>
         <p>The Analyst has stronger weapon damage and can freeze threats. The Hacker moves faster and releases an EMP pulse. The Writer has more integrity and fires a radial Citation Storm. All characters can dash.</p>
-        <p>Enemy behaviors include fast pursuit, ranged fire, splitting, armor, projectile volleys, and boss summons. After defeating the Final Committee, the player chooses one permanent talent before entering a harder floor.</p>
+        <p>Eight enemy types include fast pursuit, long-range sniping, ranged fire, splitting, armor, projectile volleys, and boss summons. After defeating the Final Committee, the player chooses one permanent talent before entering a harder floor.</p>
 
         <h2 id="architecture">4. Architecture</h2>
         <pre>Input
@@ -91,7 +92,7 @@ Canvas render -> particles -> HUD -> overlays</pre>
         <h3>Inventory replacement</h3>
         <p>New weapons fill an empty slot first. With two full slots, the new weapon replaces the active one and leaves the old weapon on the floor, allowing the player to reverse the choice.</p>
         <h3>Collision and lifecycle</h3>
-        <p>Circle-against-rectangle collision keeps players and enemies outside solid props. Axis-by-axis movement supports sliding along edges. Reverse array iteration and copied enemy lists keep removal, splitting, explosions, and area skills stable.</p>
+        <p>Circle-against-rectangle collision keeps entities outside solid props. Enemy navigation combines clear-line pursuit, A* grid pathfinding, local corner steering, crowd separation, and stuck detection, so enemies route around furniture instead of repeatedly walking into it. Reverse iteration keeps removal, splitting, explosions, and area skills stable.</p>
         <h3>Originality</h3>
         <p>The requested reference was treated as a genre and control direction, not as a request to copy copyrighted assets or exact presentation. The result uses original geometric graphics and an academic research theme.</p>
 
@@ -101,6 +102,8 @@ Canvas render -> particles -> HUD -> overlays</pre>
           <tbody>
             <tr><td>Start and move</td><td>Selected researcher enters room and respects walls</td></tr>
             <tr><td>Fire and reload</td><td>Magazine and reserve update correctly</td></tr>
+            <tr><td>Empty weapon / X / right click</td><td>Melee damages close enemies and clears nearby projectiles</td></tr>
+            <tr><td>Enemy behind obstacle</td><td>A* route moves the enemy around the obstacle</td></tr>
             <tr><td>Clear room</td><td>Chest and portal appear</td></tr>
             <tr><td>Open chest</td><td>Random-quality weapon and supplies appear</td></tr>
             <tr><td>Pick up and swap</td><td>Two-slot inventory and active HUD update</td></tr>

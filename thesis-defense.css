@@ -223,9 +223,13 @@
 .touch-dpad button { border-radius: 14px; }.touch-dpad button[data-key="up"] { grid-column: 2; }.touch-dpad button[data-key="left"] { grid-column: 1; }.touch-dpad button[data-key="down"] { grid-column: 2; }.touch-dpad button[data-key="right"] { grid-column: 3; }
 .touch-actions { position: absolute; right: 22px; bottom: 22px; display: grid; grid-template-columns: repeat(3, 56px); gap: 7px; align-items: end; pointer-events: auto; }
 .touch-actions button { height: 52px; border-radius: 50%; }
-.touch-actions .touch-fire { grid-column: 3; grid-row: 1 / span 2; width: 76px; height: 76px; margin-left: -12px; background: rgba(181, 65, 86, .72); }
-.touch-actions .touch-skill { background: rgba(117, 82, 180, .72); }
-.touch-actions .touch-dash { background: rgba(55, 118, 155, .72); }
+#touch-interact { grid-column: 1; grid-row: 1; }
+#touch-swap { grid-column: 2; grid-row: 1; }
+#touch-reload { grid-column: 3; grid-row: 1; }
+.touch-actions .touch-melee { grid-column: 1; grid-row: 2; background: rgba(224, 139, 66, .76); }
+.touch-actions .touch-dash { grid-column: 2; grid-row: 2; background: rgba(55, 118, 155, .72); }
+.touch-actions .touch-skill { grid-column: 2; grid-row: 3; background: rgba(117, 82, 180, .72); }
+.touch-actions .touch-fire { grid-column: 3; grid-row: 2 / span 2; width: 76px; height: 76px; margin-left: -12px; background: rgba(181, 65, 86, .72); }
 
 .quality-guide {
   display: flex;

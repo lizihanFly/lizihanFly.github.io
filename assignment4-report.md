@@ -52,6 +52,8 @@ Each floor contains five rooms. The first four use different obstacle layouts an
 
 Solid bookcases and lab equipment change movement and firing lines. Bullets collide with these obstacles, so the player must reposition rather than standing in one location.
 
+The expanded version uses ten standard layouts, three boss layouts, and four visual themes. Obstacles are modeled as bookshelves, desks, server racks, laboratory vats, and structural pillars rather than identical blocks.
+
 ### Weapon quality and inventory
 
 Weapons use five visible quality levels:
@@ -64,7 +66,7 @@ Weapons use five visible quality levels:
 | Epic | Purple | Large statistic increase |
 | Legendary | Orange | Highest statistics and an additional weapon trait |
 
-The player can carry two weapons. `F` picks up or replaces a weapon, `Q` switches slots, and `R` reloads. Every weapon has a separate magazine, reserve ammunition, firing delay, reload time, projectile speed, spread, and special behavior.
+The player can carry two weapons. `F` picks up or replaces a weapon, `Q` switches slots, and `R` reloads. Every weapon has a separate magazine, reserve ammunition, firing delay, reload time, projectile speed, spread, and special behavior. Right click or `X` performs a melee strike. Firing an empty weapon also uses the melee strike while reloading, so the player is never completely unable to attack.
 
 Current weapon families:
 
@@ -75,6 +77,14 @@ Current weapon families:
 - **Laser Pointer:** accurate sustained fire with piercing.
 - **Grant Launcher:** explosive area damage.
 - **Footnote Repeater:** balanced rapid-fire weapon.
+- **Tenure Revolver:** high-damage precision sidearm.
+- **Method Crossbow:** slow projectile with heavy piercing.
+- **Data Needler:** extremely fast low-damage fire.
+- **Prism Abstract:** three-way projectile spread.
+- **Citation Tesla:** chains damage between nearby enemies.
+- **Hypothesis Orb:** slow homing projectile.
+- **Burnout Projector:** short-range expanding flame spread.
+- **Recursive Proof:** projectiles ricochet from obstacles.
 
 Weapon quality chances improve on later floors, after boss fights, and through the Better Evidence talent.
 
@@ -95,6 +105,8 @@ All characters can dash with `Shift`. Dashing moves quickly through danger and b
 - **Reviewer:** stays at range and fires projectiles.
 - **Replication Error:** splits into smaller enemies.
 - **Major Revision:** slow armored enemy.
+- **Copy Editor:** aggressive, fast melee enemy.
+- **Citation Sniper:** long-range projectile enemy.
 - **Final Committee:** floor boss with volleys and reinforcements.
 
 Defeated enemies can drop integrity repair, ammunition, or research funding. Cleared rooms contain an evidence chest and exit portal.
@@ -172,7 +184,7 @@ The player has two weapon slots. Picking up a weapon fills an empty slot first. 
 
 ### Collision and navigation
 
-Players and enemies use circle collision against rectangular obstacles. Movement is resolved one axis at a time, which prevents entities from becoming stuck when sliding along a bookcase edge. Bullets are removed when they strike a wall.
+Players and enemies use circle collision against rectangular obstacles. Movement is resolved one axis at a time, which allows sliding along a bookcase edge. Enemy navigation combines direct movement when line of sight is clear, A* grid pathfinding when an obstacle blocks the target, local steering around corners, separation from nearby enemies, and a stuck detector that recalculates the route. This prevents enemies from continuously walking into a wall.
 
 ### Safe entity lifecycle
 
@@ -196,6 +208,8 @@ The requested direction was interpreted as a genre and control reference, not a 
 | Move against arena or obstacle | Player remains in valid walkable space |
 | Aim and fire | Projectiles travel toward the pointer |
 | Empty a magazine | Automatic reload begins when reserve ammunition exists |
+| Fire with an empty magazine | Emergency melee strike activates before or during reload |
+| Press `X` or right click | Melee arc damages close enemies and removes nearby enemy projectiles |
 | Press `R` | Current weapon reloads without exceeding magazine capacity |
 | Clear a room | Evidence chest and exit portal appear |
 | Open chest | A weapon with a visible random quality appears |
@@ -211,6 +225,7 @@ The requested direction was interpreted as a genre and control reference, not a 
 | Integrity reaches zero | Game-over result appears |
 | Finish a run | Best score is stored in `localStorage` |
 | Use mobile controls | All essential actions remain available |
+| Place obstacles between enemy and player | Enemy computes a route around the obstacle instead of remaining against the wall |
 
 ### Automated and static checks
 
