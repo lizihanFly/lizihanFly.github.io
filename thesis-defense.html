@@ -37,7 +37,9 @@
 
       <section class="arena-card" aria-label="Defend Your Thesis game">
         <div class="canvas-wrap" id="canvas-wrap">
-          <canvas id="game-canvas" width="1100" height="680" aria-label="Top-down thesis dungeon game"></canvas>
+          <button class="fullscreen-button" id="fullscreen-button" type="button" aria-label="Enter fullscreen" title="Fullscreen (G)">FULL</button>
+          <div class="game-stage" id="game-stage">
+            <canvas id="game-canvas" width="1100" height="680" aria-label="Top-down thesis dungeon game"></canvas>
 
           <div class="game-hud" id="game-hud" hidden>
             <div class="hud-top">
@@ -122,7 +124,7 @@
                 </button>
               </div>
               <button class="primary-button" id="start-button" type="button">Enter Dungeon</button>
-              <p class="control-note">Move: WASD / arrows &middot; Fire: click / space &middot; Melee: right click / X &middot; Pick up: F &middot; Swap: Q &middot; Reload: R</p>
+              <p class="control-note">Move: WASD &middot; Fire: click / space &middot; Melee: right click / X &middot; Pick up: F &middot; Swap: Q &middot; Reload: R &middot; Fullscreen: G</p>
             </div>
           </div>
 
@@ -173,6 +175,7 @@
               <button class="touch-skill" id="touch-ability" type="button">SKILL</button>
               <button class="touch-fire" id="touch-fire" type="button">FIRE</button>
             </div>
+          </div>
           </div>
         </div>
       </section>

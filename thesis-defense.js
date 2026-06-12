@@ -3,6 +3,7 @@
 
   const canvas = document.getElementById("game-canvas");
   const ctx = canvas.getContext("2d");
+  const canvasWrap = document.getElementById("canvas-wrap");
   const W = canvas.width;
   const H = canvas.height;
 
@@ -33,6 +34,7 @@
     upgradeGrid: document.getElementById("upgrade-grid"),
     pauseScreen: document.getElementById("pause-screen"),
     pauseButton: document.getElementById("pause-button"),
+    fullscreenButton: document.getElementById("fullscreen-button"),
     resumeButton: document.getElementById("resume-button"),
     gameOverScreen: document.getElementById("game-over-screen"),
     finalScore: document.getElementById("final-score"),
@@ -1984,6 +1986,26 @@
     if (state.paused) pointer.down = false;
   }
 
+  async function toggleFullscreen() {
+    try {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const request = canvasWrap.requestFullscreen || canvasWrap.webkitRequestFullscreen;
+        if (request) await request.call(canvasWrap);
+      } else {
+        const exit = document.exitFullscreen || document.webkitExitFullscreen;
+        if (exit) await exit.call(document);
+      }
+    } catch (error) {
+      console.warn("Fullscreen is not available in this browser.", error);
+    }
+  }
+
+  function updateFullscreenButton() {
+    const active = document.fullscreenElement === canvasWrap || document.webkitFullscreenElement === canvasWrap;
+    ui.fullscreenButton.textContent = active ? "EXIT" : "FULL";
+    ui.fullscreenButton.setAttribute("aria-label", active ? "Exit fullscreen" : "Enter fullscreen");
+  }
+
   function canvasPoint(event) {
     const rect = canvas.getBoundingClientRect();
     return { x: (event.clientX - rect.left) * W / rect.width, y: (event.clientY - rect.top) * H / rect.height };
@@ -1998,15 +2020,17 @@
   ui.startButton.addEventListener("click", startGame);
   ui.restartButton.addEventListener("click", startGame);
   ui.pauseButton.addEventListener("click", () => togglePause());
+  ui.fullscreenButton.addEventListener("click", toggleFullscreen);
   ui.resumeButton.addEventListener("click", () => togglePause(false));
   ui.weaponSlots.forEach((slot, index) => slot.addEventListener("click", () => switchWeapon(index)));
 
   window.addEventListener("keydown", event => {
     keys[event.code] = true;
     if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.code)) event.preventDefault();
-    if (event.repeat && ["KeyF", "KeyQ", "KeyR", "KeyE", "KeyX", "ShiftLeft", "ShiftRight"].includes(event.code)) return;
+    if (event.repeat && ["KeyF", "KeyG", "KeyQ", "KeyR", "KeyE", "KeyX", "ShiftLeft", "ShiftRight"].includes(event.code)) return;
     if (event.code === "Escape") togglePause();
     if (event.code === "KeyF") interact();
+    if (event.code === "KeyG") toggleFullscreen();
     if (event.code === "KeyQ") cycleWeapon();
     if (event.code === "KeyR") startReload();
     if (event.code === "KeyX") meleeAttack();
@@ -2020,6 +2044,8 @@
     pointer.down = false;
     Object.keys(keys).forEach(k => { keys[k] = false; });
   });
+  document.addEventListener("fullscreenchange", updateFullscreenButton);
+  document.addEventListener("webkitfullscreenchange", updateFullscreenButton);
 
   canvas.addEventListener("pointermove", event => {
     const p = canvasPoint(event);

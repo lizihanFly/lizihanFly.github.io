@@ -29,6 +29,7 @@ The application uses HTML, CSS, JavaScript, and the Canvas 2D API. It is hosted 
 | Keyboard controls | WASD/arrows, mouse aim, click/space fire, `F` interact, `Q` swap, `R` reload |
 | Mouse controls | Pointer aiming, click-to-fire, and clickable weapon slots |
 | Mobile controls | Direction pad, auto-aim fire, pickup, swap, reload, dash, and skill buttons |
+| Fullscreen presentation | Fullscreen API button and `G` shortcut with aspect-ratio preservation |
 | Character movement and collision | Arena boundaries and solid room obstacles |
 | AI-assisted development | Architecture and problem solving documented below |
 | Markdown report | This file |
