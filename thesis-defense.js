@@ -61,63 +61,63 @@
   const weaponBases = {
     pistol: {
       name: "Research Pistol", short: "Pistol", damage: 22, delay: .27, mag: 12,
-      reload: 1.05, speed: 650, pellets: 1, spread: .02, pierce: 0, explosive: 0, color: "#dce4ef", model: "pistol"
+      reload: 1.05, speed: 650, pellets: 1, spread: .02, pierce: 0, explosive: 0, color: "#dce4ef", model: "pistol", house: "axiom"
     },
     smg: {
       name: "Citation SMG", short: "SMG", damage: 10, delay: .085, mag: 30,
-      reload: 1.35, speed: 720, pellets: 1, spread: .1, pierce: 0, explosive: 0, color: "#74dcad", model: "smg"
+      reload: 1.35, speed: 720, pellets: 1, spread: .1, pierce: 0, explosive: 0, color: "#74dcad", model: "smg", house: "vector"
     },
     shotgun: {
       name: "Scatter Thesis", short: "Shotgun", damage: 12, delay: .58, mag: 7,
-      reload: 1.55, speed: 570, pellets: 6, spread: .38, pierce: 0, explosive: 0, color: "#ffcb72", model: "shotgun"
+      reload: 1.55, speed: 570, pellets: 6, spread: .38, pierce: 0, explosive: 0, color: "#ffcb72", model: "shotgun", house: "forge"
     },
     railgun: {
       name: "Peer Review Railgun", short: "Railgun", damage: 63, delay: .76, mag: 5,
-      reload: 1.8, speed: 980, pellets: 1, spread: .008, pierce: 3, explosive: 0, color: "#79c5ff", model: "railgun"
+      reload: 1.8, speed: 980, pellets: 1, spread: .008, pierce: 3, explosive: 0, color: "#79c5ff", model: "railgun", house: "helix"
     },
     laser: {
       name: "Laser Pointer", short: "Laser", damage: 8, delay: .055, mag: 42,
-      reload: 1.48, speed: 900, pellets: 1, spread: .035, pierce: 1, explosive: 0, color: "#ff6e96", model: "laser"
+      reload: 1.48, speed: 900, pellets: 1, spread: .035, pierce: 1, explosive: 0, color: "#ff6e96", model: "laser", house: "helix"
     },
     launcher: {
       name: "Grant Launcher", short: "Launcher", damage: 38, delay: .82, mag: 4,
-      reload: 1.95, speed: 440, pellets: 1, spread: .03, pierce: 0, explosive: 82, color: "#c692ff", model: "launcher"
+      reload: 1.95, speed: 440, pellets: 1, spread: .03, pierce: 0, explosive: 82, color: "#c692ff", model: "launcher", house: "forge"
     },
     burst: {
       name: "Footnote Repeater", short: "Repeater", damage: 16, delay: .145, mag: 21,
-      reload: 1.25, speed: 760, pellets: 1, spread: .055, pierce: 0, explosive: 0, color: "#95e3ec", model: "carbine"
+      reload: 1.25, speed: 760, pellets: 1, spread: .055, pierce: 0, explosive: 0, color: "#95e3ec", model: "carbine", house: "axiom"
     },
     revolver: {
       name: "Tenure Revolver", short: "Revolver", damage: 48, delay: .48, mag: 6,
-      reload: 1.6, speed: 820, pellets: 1, spread: .018, pierce: 1, explosive: 0, color: "#f0b668", model: "revolver"
+      reload: 1.6, speed: 820, pellets: 1, spread: .018, pierce: 1, explosive: 0, color: "#f0b668", model: "revolver", house: "forge"
     },
     crossbow: {
       name: "Method Crossbow", short: "Crossbow", damage: 76, delay: .92, mag: 4,
-      reload: 1.75, speed: 720, pellets: 1, spread: 0, pierce: 4, explosive: 0, color: "#b3e27c", model: "crossbow"
+      reload: 1.75, speed: 720, pellets: 1, spread: 0, pierce: 4, explosive: 0, color: "#b3e27c", model: "crossbow", house: "relic"
     },
     needler: {
       name: "Data Needler", short: "Needler", damage: 6.5, delay: .042, mag: 55,
-      reload: 1.55, speed: 840, pellets: 1, spread: .075, pierce: 0, explosive: 0, color: "#73f1d4", model: "needler"
+      reload: 1.55, speed: 840, pellets: 1, spread: .075, pierce: 0, explosive: 0, color: "#73f1d4", model: "needler", house: "vector"
     },
     prism: {
       name: "Prism Abstract", short: "Prism", damage: 18, delay: .34, mag: 15,
-      reload: 1.4, speed: 690, pellets: 3, spread: .23, pierce: 0, explosive: 0, color: "#e49bff", model: "prism"
+      reload: 1.4, speed: 690, pellets: 3, spread: .23, pierce: 0, explosive: 0, color: "#e49bff", model: "prism", house: "relic"
     },
     tesla: {
       name: "Citation Tesla", short: "Tesla", damage: 27, delay: .44, mag: 11,
-      reload: 1.5, speed: 760, pellets: 1, spread: .025, pierce: 0, explosive: 0, chain: 3, color: "#76dcff", model: "tesla"
+      reload: 1.5, speed: 760, pellets: 1, spread: .025, pierce: 0, explosive: 0, chain: 3, color: "#76dcff", model: "tesla", house: "helix"
     },
     orb: {
       name: "Hypothesis Orb", short: "Orb", damage: 31, delay: .52, mag: 9,
-      reload: 1.55, speed: 430, pellets: 1, spread: .03, pierce: 1, explosive: 0, homing: 4.2, color: "#a892ff", model: "orb"
+      reload: 1.55, speed: 430, pellets: 1, spread: .03, pierce: 1, explosive: 0, homing: 4.2, color: "#a892ff", model: "orb", house: "relic"
     },
     flame: {
       name: "Burnout Projector", short: "Projector", damage: 7, delay: .075, mag: 48,
-      reload: 1.65, speed: 350, pellets: 3, spread: .32, pierce: 0, explosive: 0, life: .48, grow: true, color: "#ff8a54", model: "flame"
+      reload: 1.65, speed: 350, pellets: 3, spread: .32, pierce: 0, explosive: 0, life: .48, grow: true, color: "#ff8a54", model: "flame", house: "forge"
     },
     ricochet: {
       name: "Recursive Proof", short: "Ricochet", damage: 24, delay: .3, mag: 16,
-      reload: 1.35, speed: 720, pellets: 1, spread: .025, pierce: 0, explosive: 0, bounces: 3, color: "#ffe36b", model: "ricochet"
+      reload: 1.35, speed: 720, pellets: 1, spread: .025, pierce: 0, explosive: 0, bounces: 3, color: "#ffe36b", model: "ricochet", house: "vector"
     }
   };
 
@@ -195,7 +195,8 @@
       player: {
         x: 120, y: H / 2, radius: 17, angle: 0, color: c.color, speed: c.speed,
         invulnerable: 0, dashCooldown: 0, dashTime: 0, dashX: 0, dashY: 0,
-        skillCooldown: 0, fireCooldown: 0, meleeCooldown: 0, meleeTime: 0, reloading: 0
+        skillCooldown: 0, fireCooldown: 0, meleeCooldown: 0, meleeTime: 0,
+        recoil: 0, muzzleFlash: 0, barrelHeat: 0, reloading: 0
       },
       inventory: [createWeapon("pistol", "common"), null],
       activeSlot: 0,
@@ -203,6 +204,7 @@
       bullets: [],
       enemyBullets: [],
       particles: [],
+      effects: [],
       pickups: [],
       interactables: [],
       obstacles: [],
@@ -229,7 +231,7 @@
       speed: base.speed, pellets: base.pellets, spread: base.spread,
       pierce: base.pierce + (qualityId === "legendary" && base.pierce === 0 ? 1 : 0),
       explosive: base.explosive + (qualityId === "legendary" && baseId !== "launcher" ? 32 : 0),
-      model: base.model, chain: base.chain || 0, homing: base.homing || 0,
+      model: base.model, house: base.house || "axiom", chain: base.chain || 0, homing: base.homing || 0,
       bounces: base.bounces || 0, life: base.life || 1.7, grow: Boolean(base.grow)
     };
   }
@@ -258,6 +260,7 @@
     s.pickups = [];
     s.interactables = [];
     s.particles = [];
+    s.effects = [];
     s.player.x = 105;
     s.player.y = H / 2;
     s.player.reloading = 0;
@@ -326,6 +329,7 @@
     updateEnemyBullets(dt);
     updatePickups(dt);
     updateParticles(dt);
+    updateEffects(dt);
     updateInteraction();
 
     if (state.roomState === "combat" && state.pendingSpawns <= 0 && state.enemies.length === 0) {
@@ -347,6 +351,9 @@
     p.fireCooldown = Math.max(0, p.fireCooldown - dt);
     p.meleeCooldown = Math.max(0, p.meleeCooldown - dt);
     p.meleeTime = Math.max(0, p.meleeTime - dt);
+    p.recoil = Math.max(0, p.recoil - dt * 42);
+    p.muzzleFlash = Math.max(0, p.muzzleFlash - dt);
+    p.barrelHeat = Math.max(0, p.barrelHeat - dt * .85);
 
     let dx = (keys.KeyD || keys.ArrowRight || touchKeys.right ? 1 : 0) - (keys.KeyA || keys.ArrowLeft || touchKeys.left ? 1 : 0);
     let dy = (keys.KeyS || keys.ArrowDown || touchKeys.down ? 1 : 0) - (keys.KeyW || keys.ArrowUp || touchKeys.up ? 1 : 0);
@@ -367,7 +374,7 @@
     const aimY = autoTarget ? autoTarget.y : pointer.y;
     p.angle = Math.atan2(aimY - p.y, aimX - p.x);
 
-    if ((pointer.down || keys.Space) && !p.reloading) fireWeapon();
+    if (pointer.down || keys.Space) fireWeapon();
 
     if (p.reloading > 0) {
       p.reloading -= dt;
@@ -497,6 +504,9 @@
     if (p.reloading > 0) return;
     weapon.ammo--;
     p.fireCooldown = weapon.delay;
+    p.recoil = Math.min(10, 3 + weapon.damage * .055 + weapon.pellets * .42);
+    p.muzzleFlash = weapon.model === "flame" ? .1 : .065;
+    p.barrelHeat = Math.min(1, p.barrelHeat + .08 + 1 / weapon.mag);
     const quality = qualities[weapon.qualityId];
     for (let i = 0; i < weapon.pellets; i++) {
       const offset = weapon.pellets === 1 ? random(-weapon.spread, weapon.spread) : (i / (weapon.pellets - 1) - .5) * weapon.spread + random(-.025, .025);
@@ -507,7 +517,18 @@
         radius: weapon.baseId === "launcher" ? 7 : weapon.baseId === "railgun" ? 4 : 3.5,
         damage: weapon.damage * state.damageMult, life: weapon.life, pierce: weapon.pierce,
         explosive: weapon.explosive, chain: weapon.chain, homing: weapon.homing,
-        bounces: weapon.bounces, grow: weapon.grow, color: quality.color, hit: new Set()
+        bounces: weapon.bounces, grow: weapon.grow, model: weapon.model,
+        qualityId: weapon.qualityId, color: quality.color, hit: new Set()
+      });
+    }
+    addMuzzleEffect(p, weapon, quality.color);
+    if (!["laser", "orb", "prism", "flame", "tesla"].includes(weapon.model)) {
+      const side = p.angle - Math.PI / 2;
+      state.effects.push({
+        type: "casing", x: p.x + Math.cos(p.angle) * 8, y: p.y + Math.sin(p.angle) * 8,
+        vx: Math.cos(side) * random(55, 95) - Math.cos(p.angle) * 20,
+        vy: Math.sin(side) * random(55, 95) - Math.sin(p.angle) * 20,
+        rotation: p.angle, spin: random(-12, 12), life: .55, maxLife: .55, color: "#e8c878"
       });
     }
     state.shake = Math.min(5, state.shake + (weapon.pellets > 1 || weapon.explosive ? 2.2 : .5));
@@ -536,7 +557,9 @@
           b.y = oldY;
           b.bounces--;
           addParticle(b.x, b.y, b.color, 5, 55);
+          addImpactEffect(b.x, b.y, b.color, "ricochet");
         } else {
+          addImpactEffect(b.x, b.y, b.color, b.model);
           remove = true;
         }
       }
@@ -545,6 +568,7 @@
         if (b.hit.has(e) || distance(b, e) > b.radius + e.radius) continue;
         b.hit.add(e);
         hitEnemy(e, b.damage);
+        addImpactEffect(b.x, b.y, b.color, b.model, true);
         if (b.chain > 0) chainLightning(e, b);
         if (b.explosive) {
           explode(b.x, b.y, b.explosive, b.damage * .72, b.color, e);
@@ -682,6 +706,14 @@
 
   function explode(x, y, radius, damage, color, ignored) {
     addParticle(x, y, color, 18, radius * 1.8);
+    state.effects.push({
+      type: "ring", layer: "under", x, y, radius: 8, endRadius: radius,
+      lineWidth: 8, life: .38, maxLife: .38, color
+    });
+    state.effects.push({
+      type: "flash", layer: "over", x, y, radius: radius * .42,
+      life: .14, maxLife: .14, color: "#fff6cf"
+    });
     state.enemies.slice().forEach(e => {
       if (e !== ignored && distance({ x, y }, e) < radius + e.radius) {
         const falloff = 1 - Math.min(.55, distance({ x, y }, e) / (radius * 2));
@@ -1211,10 +1243,12 @@
     drawInteractables();
     drawPickups();
     drawParticles();
+    drawEffects("under");
     state.bullets.forEach(drawBullet);
     state.enemyBullets.forEach(drawEnemyBullet);
     state.enemies.forEach(drawEnemy);
     drawPlayer();
+    drawEffects("over");
     drawBossBar();
     if (state.messageTimer > 0) drawMessage();
     ctx.restore();
@@ -1373,15 +1407,35 @@
       const bob = Math.sin(item.pulse * 4) * 4;
       if (item.type === "weapon") {
         const q = qualities[item.weapon.qualityId];
+        const qualityOrder = ["common", "uncommon", "rare", "epic", "legendary"];
+        const rank = qualityOrder.indexOf(item.weapon.qualityId);
+        const time = performance.now() * .001;
         ctx.save();
         ctx.translate(item.x, item.y + bob);
-        ctx.shadowColor = q.color; ctx.shadowBlur = 25;
-        ctx.fillStyle = "rgba(17,22,37,.86)";
-        roundRect(-38, -21, 76, 42, 11); ctx.fill();
-        ctx.scale(1.15, 1.15);
+        const beam = ctx.createLinearGradient(0, -90, 0, 20);
+        beam.addColorStop(0, "transparent");
+        beam.addColorStop(.75, `${q.color}${rank >= 3 ? "42" : "25"}`);
+        beam.addColorStop(1, "transparent");
+        ctx.fillStyle = beam;
+        ctx.beginPath(); ctx.moveTo(-23, 19); ctx.lineTo(-8, -86); ctx.lineTo(8, -86); ctx.lineTo(23, 19); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = q.color;
+        ctx.globalAlpha = .38 + rank * .08;
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.ellipse(0, 18, 34 + Math.sin(time * 3) * 3, 10, 0, 0, Math.PI * 2); ctx.stroke();
+        ctx.save(); ctx.rotate(time * (rank >= 3 ? 1.8 : 1));
+        ctx.setLineDash([8, 10]);
+        ctx.beginPath(); ctx.ellipse(0, 0, 43, 23, 0, 0, Math.PI * 2); ctx.stroke();
+        ctx.restore();
+        ctx.globalAlpha = 1;
+        ctx.shadowColor = q.color; ctx.shadowBlur = 30 + rank * 5;
+        ctx.fillStyle = "rgba(17,22,37,.9)";
+        roundRect(-42, -24, 84, 48, 12); ctx.fill();
+        ctx.scale(1.32, 1.32);
         drawWeaponModel(item.weapon, q.color);
-        ctx.fillStyle = "#fff"; ctx.font = "800 9px DM Sans"; ctx.textAlign = "center";
-        ctx.fillText(q.label, 27, -11);
+        ctx.scale(1 / 1.32, 1 / 1.32);
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = q.color; ctx.font = "800 9px DM Sans"; ctx.textAlign = "center";
+        ctx.fillText(`${q.name.toUpperCase()} // ${item.weapon.short.toUpperCase()}`, 0, -32);
         ctx.restore();
       } else {
         ctx.save();
@@ -1424,12 +1478,22 @@
       ctx.stroke();
       ctx.globalAlpha = 1;
     }
-    if (weapon) drawWeaponModel(weapon, qualities[weapon.qualityId].color);
+    if (weapon) {
+      ctx.save();
+      ctx.translate(-p.recoil, 0);
+      ctx.scale(1.2, 1.2);
+      drawWeaponModel(weapon, qualities[weapon.qualityId].color);
+      ctx.restore();
+      if (p.muzzleFlash > 0) drawPlayerMuzzleFlash(weapon, p.muzzleFlash, p.barrelHeat);
+    }
     ctx.restore();
   }
 
   function drawWeaponModel(weapon, qualityColor) {
     const model = weapon.model || "pistol";
+    const qualityOrder = ["common", "uncommon", "rare", "epic", "legendary"];
+    const rank = Math.max(0, qualityOrder.indexOf(weapon.qualityId));
+    const time = performance.now() * .001;
     ctx.save();
     ctx.translate(9, 0);
     ctx.lineJoin = "round";
@@ -1437,6 +1501,29 @@
     ctx.strokeStyle = "#0d1220";
     ctx.lineWidth = 2.2;
     ctx.fillStyle = qualityColor;
+
+    if (rank >= 2) {
+      ctx.save();
+      ctx.globalAlpha = .12 + rank * .045 + Math.sin(time * 4) * .035;
+      ctx.shadowColor = qualityColor;
+      ctx.shadowBlur = 18 + rank * 5;
+      ctx.fillStyle = qualityColor;
+      roundRect(-8, -13, 57, 26, 12); ctx.fill();
+      ctx.restore();
+    }
+    if (weapon.house === "helix") {
+      ctx.strokeStyle = qualityColor; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(2, -10); ctx.lineTo(12, -15); ctx.lineTo(24, -10); ctx.stroke();
+    } else if (weapon.house === "forge") {
+      ctx.fillStyle = "#4c3027";
+      ctx.beginPath(); ctx.moveTo(-6, -8); ctx.lineTo(4, -12); ctx.lineTo(7, -6); ctx.closePath(); ctx.fill();
+    } else if (weapon.house === "vector") {
+      ctx.strokeStyle = qualityColor; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(-5, -10); ctx.lineTo(2, -15); ctx.lineTo(7, -10); ctx.stroke();
+    } else if (weapon.house === "relic") {
+      ctx.fillStyle = qualityColor; ctx.globalAlpha = .45;
+      polygon(7, 0, 8, 6); ctx.fill(); ctx.globalAlpha = 1;
+    }
 
     if (model === "pistol" || model === "revolver") {
       roundRect(0, -6, model === "revolver" ? 25 : 29, 11, 4); ctx.fill(); ctx.stroke();
@@ -1503,6 +1590,61 @@
       ctx.fillStyle = "#252d40"; roundRect(-4, -5, 23, 10, 4); ctx.fill(); ctx.stroke();
       ctx.fillStyle = "#fff2a3"; ctx.beginPath(); ctx.arc(29, 0, 4, 0, Math.PI * 2); ctx.fill();
     }
+    if (rank >= 1) {
+      ctx.fillStyle = "#f7fbff";
+      ctx.shadowColor = qualityColor;
+      ctx.shadowBlur = 8 + rank * 3;
+      ctx.beginPath();
+      ctx.arc(model === "launcher" || model === "flame" ? 11 : 17, 0, 2.2 + rank * .35, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    if (rank >= 3) {
+      ctx.strokeStyle = qualityColor;
+      ctx.lineWidth = 1.5;
+      ctx.globalAlpha = .75;
+      const pulse = 2 + Math.sin(time * 6) * 1.2;
+      ctx.beginPath(); ctx.moveTo(4, -10 - pulse); ctx.lineTo(38, -10 - pulse); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(4, 10 + pulse); ctx.lineTo(32, 10 + pulse); ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    if (rank === 4) {
+      ctx.fillStyle = qualityColor;
+      for (let i = 0; i < 3; i++) {
+        const orbit = time * 3 + i * Math.PI * 2 / 3;
+        ctx.beginPath();
+        ctx.arc(20 + Math.cos(orbit) * 8, Math.sin(orbit) * 11, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawPlayerMuzzleFlash(weapon, life, heat) {
+    const lengthByModel = {
+      pistol: 42, revolver: 45, smg: 48, carbine: 55, needler: 57, shotgun: 58,
+      railgun: 68, laser: 57, tesla: 58, launcher: 60, flame: 62, crossbow: 61,
+      prism: 58, orb: 49, ricochet: 52
+    };
+    const x = (lengthByModel[weapon.model] || 50) * 1.17 - state.player.recoil;
+    const color = qualities[weapon.qualityId].color;
+    ctx.save();
+    ctx.translate(x, 0);
+    ctx.globalAlpha = Math.min(1, life * 18);
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 22 + heat * 16;
+    ctx.fillStyle = weapon.model === "flame" ? "#ffdd75" : "#fff";
+    const size = weapon.model === "shotgun" || weapon.model === "launcher" ? 17 : 11;
+    ctx.beginPath();
+    for (let i = 0; i < 8; i++) {
+      const angle = i / 8 * Math.PI * 2;
+      const radius = i % 2 ? size * .35 : size * random(.8, 1.25);
+      const px = Math.cos(angle) * radius;
+      const py = Math.sin(angle) * radius;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = color; ctx.globalAlpha *= .75;
+    ctx.beginPath(); ctx.arc(0, 0, size * .42, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
   }
 
@@ -1546,8 +1688,72 @@
 
   function drawBullet(b) {
     ctx.save();
-    ctx.shadowColor = b.color; ctx.shadowBlur = 12; ctx.fillStyle = b.color;
-    ctx.beginPath(); ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2); ctx.fill();
+    ctx.translate(b.x, b.y);
+    const angle = Math.atan2(b.vy, b.vx);
+    ctx.rotate(angle);
+    ctx.shadowColor = b.color;
+    ctx.shadowBlur = b.model === "orb" ? 24 : 14;
+    ctx.fillStyle = b.color;
+    const speed = Math.hypot(b.vx, b.vy);
+    const trail = Math.min(34, speed * .025);
+
+    if (b.model === "railgun") {
+      const gradient = ctx.createLinearGradient(-42, 0, 10, 0);
+      gradient.addColorStop(0, "transparent");
+      gradient.addColorStop(.65, b.color);
+      gradient.addColorStop(1, "#ffffff");
+      ctx.fillStyle = gradient;
+      roundRect(-42, -3, 55, 6, 3); ctx.fill();
+      ctx.fillStyle = "#fff"; roundRect(3, -2, 14, 4, 2); ctx.fill();
+    } else if (b.model === "laser") {
+      const gradient = ctx.createLinearGradient(-trail, 0, 12, 0);
+      gradient.addColorStop(0, "transparent"); gradient.addColorStop(.5, b.color); gradient.addColorStop(1, "#fff");
+      ctx.fillStyle = gradient; roundRect(-trail, -2.2, trail + 14, 4.4, 3); ctx.fill();
+    } else if (b.model === "crossbow") {
+      ctx.strokeStyle = b.color; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(-18, 0); ctx.lineTo(11, 0); ctx.stroke();
+      ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.moveTo(15, 0); ctx.lineTo(6, -5); ctx.lineTo(6, 5); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = "#b9e58a"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(-13, 0); ctx.lineTo(-20, -6); ctx.moveTo(-13, 0); ctx.lineTo(-20, 6); ctx.stroke();
+    } else if (b.model === "launcher") {
+      ctx.fillStyle = "#1b2032"; ctx.beginPath(); ctx.arc(0, 0, b.radius + 2, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = b.color; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, 0, b.radius, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = "#fff0c8"; ctx.beginPath(); ctx.arc(2, 0, 2.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = b.color; ctx.globalAlpha = .65; ctx.beginPath(); ctx.moveTo(-5, -4); ctx.lineTo(-19, 0); ctx.lineTo(-5, 4); ctx.closePath(); ctx.fill();
+    } else if (b.model === "orb") {
+      const pulse = 1 + Math.sin(performance.now() * .018 + b.x) * .2;
+      ctx.strokeStyle = b.color; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.arc(0, 0, (b.radius + 5) * pulse, 0, Math.PI * 2); ctx.stroke();
+      ctx.rotate(performance.now() * .006);
+      for (let i = 0; i < 3; i++) {
+        ctx.rotate(Math.PI * 2 / 3);
+        ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.radius + 7, 0, 2.3, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(0, 0, b.radius, 0, Math.PI * 2); ctx.fill();
+    } else if (b.model === "flame") {
+      const gradient = ctx.createRadialGradient(4, 0, 1, 0, 0, b.radius + 7);
+      gradient.addColorStop(0, "#fff7ad"); gradient.addColorStop(.4, b.color); gradient.addColorStop(1, "transparent");
+      ctx.fillStyle = gradient; ctx.beginPath(); ctx.arc(0, 0, b.radius + 7, 0, Math.PI * 2); ctx.fill();
+    } else if (b.model === "ricochet") {
+      ctx.rotate(performance.now() * .012);
+      ctx.fillStyle = b.color; polygon(0, 0, b.radius + 4, 6); ctx.fill();
+      ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.5; polygon(0, 0, b.radius + 1, 6); ctx.stroke();
+    } else if (b.model === "tesla") {
+      ctx.strokeStyle = b.color; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(-trail, 0); ctx.lineTo(-trail * .7, -4); ctx.lineTo(-trail * .4, 4); ctx.lineTo(0, 0); ctx.stroke();
+      ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(4, 0, b.radius, 0, Math.PI * 2); ctx.fill();
+    } else if (b.model === "prism") {
+      ctx.fillStyle = b.color; polygon(0, 0, b.radius + 3, 3); ctx.fill();
+      ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.2; polygon(0, 0, b.radius + 1, 3); ctx.stroke();
+      ctx.globalAlpha = .35; ctx.fillStyle = b.color; ctx.beginPath(); ctx.moveTo(-trail, -5); ctx.lineTo(3, 0); ctx.lineTo(-trail, 5); ctx.closePath(); ctx.fill();
+    } else if (b.model === "needler") {
+      ctx.fillStyle = b.color; ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(-7, -3); ctx.lineTo(-3, 0); ctx.lineTo(-7, 3); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = "#d9fff8"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(-16, 0); ctx.lineTo(-2, 0); ctx.stroke();
+    } else {
+      const gradient = ctx.createLinearGradient(-trail, 0, 9, 0);
+      gradient.addColorStop(0, "transparent"); gradient.addColorStop(.72, b.color); gradient.addColorStop(1, "#fff");
+      ctx.fillStyle = gradient; roundRect(-trail, -b.radius, trail + 11, b.radius * 2, b.radius); ctx.fill();
+    }
     ctx.restore();
   }
 
@@ -1581,6 +1787,106 @@
         life: random(.25, .7), maxLife: .7, size: random(2, 5), color
       });
     }
+  }
+
+  function addMuzzleEffect(player, weapon, color) {
+    const barrel = {
+      pistol: 50, revolver: 53, smg: 56, carbine: 63, needler: 65, shotgun: 66,
+      railgun: 76, laser: 65, tesla: 66, launcher: 68, flame: 70, crossbow: 69,
+      prism: 66, orb: 57, ricochet: 60
+    }[weapon.model] || 58;
+    const x = player.x + Math.cos(player.angle) * (barrel - player.recoil);
+    const y = player.y + Math.sin(player.angle) * (barrel - player.recoil);
+    state.effects.push({
+      type: "muzzle", layer: "over", x, y, rotation: player.angle,
+      size: weapon.pellets > 1 || weapon.explosive ? 21 : 14,
+      life: .1, maxLife: .1, color, model: weapon.model
+    });
+    state.effects.push({
+      type: "ring", layer: "under", x, y, radius: 3,
+      endRadius: weapon.model === "railgun" ? 32 : 18,
+      lineWidth: 3, life: .16, maxLife: .16, color
+    });
+  }
+
+  function addImpactEffect(x, y, color, model, enemyHit = false) {
+    const strong = ["railgun", "launcher", "shotgun", "crossbow"].includes(model);
+    state.effects.push({
+      type: "ring", layer: "under", x, y, radius: 2,
+      endRadius: strong ? 24 : 13, lineWidth: strong ? 4 : 2,
+      life: strong ? .24 : .15, maxLife: strong ? .24 : .15, color
+    });
+    const count = strong ? 8 : 4;
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = random(45, strong ? 145 : 90);
+      state.effects.push({
+        type: "spark", layer: "over", x, y,
+        vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+        rotation: angle, length: random(5, strong ? 14 : 9),
+        life: random(.13, .3), maxLife: .3, color: enemyHit && i % 3 === 0 ? "#fff" : color
+      });
+    }
+  }
+
+  function updateEffects(dt) {
+    for (let i = state.effects.length - 1; i >= 0; i--) {
+      const effect = state.effects[i];
+      effect.life -= dt;
+      if (effect.type === "casing") {
+        effect.x += effect.vx * dt;
+        effect.y += effect.vy * dt;
+        effect.vx *= .96;
+        effect.vy = effect.vy * .96 + 150 * dt;
+        effect.rotation += effect.spin * dt;
+      } else if (effect.type === "spark") {
+        effect.x += effect.vx * dt;
+        effect.y += effect.vy * dt;
+        effect.vx *= .92;
+        effect.vy *= .92;
+      } else if (effect.type === "ring") {
+        const progress = 1 - effect.life / effect.maxLife;
+        effect.currentRadius = effect.radius + (effect.endRadius - effect.radius) * progress;
+      }
+      if (effect.life <= 0) state.effects.splice(i, 1);
+    }
+  }
+
+  function drawEffects(layer) {
+    state.effects.forEach(effect => {
+      if ((effect.layer || "over") !== layer) return;
+      const alpha = clamp(effect.life / effect.maxLife, 0, 1);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.translate(effect.x, effect.y);
+      if (effect.type === "ring") {
+        ctx.strokeStyle = effect.color;
+        ctx.shadowColor = effect.color;
+        ctx.shadowBlur = 12;
+        ctx.lineWidth = effect.lineWidth * alpha;
+        ctx.beginPath(); ctx.arc(0, 0, effect.currentRadius || effect.radius, 0, Math.PI * 2); ctx.stroke();
+      } else if (effect.type === "flash") {
+        const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, effect.radius);
+        gradient.addColorStop(0, effect.color); gradient.addColorStop(1, "transparent");
+        ctx.fillStyle = gradient; ctx.beginPath(); ctx.arc(0, 0, effect.radius, 0, Math.PI * 2); ctx.fill();
+      } else if (effect.type === "muzzle") {
+        ctx.rotate(effect.rotation);
+        ctx.shadowColor = effect.color; ctx.shadowBlur = 20;
+        ctx.fillStyle = effect.model === "flame" ? "#ffcf63" : "#ffffff";
+        ctx.beginPath(); ctx.moveTo(effect.size, 0); ctx.lineTo(-4, -effect.size * .45); ctx.lineTo(1, 0); ctx.lineTo(-4, effect.size * .45); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = effect.color; ctx.beginPath(); ctx.arc(0, 0, effect.size * .34, 0, Math.PI * 2); ctx.fill();
+      } else if (effect.type === "spark") {
+        ctx.rotate(effect.rotation);
+        ctx.strokeStyle = effect.color; ctx.shadowColor = effect.color; ctx.shadowBlur = 8; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(-effect.length, 0); ctx.lineTo(effect.length * .25, 0); ctx.stroke();
+      } else if (effect.type === "casing") {
+        ctx.rotate(effect.rotation);
+        ctx.fillStyle = effect.color;
+        roundRect(-3, -1.5, 6, 3, 1); ctx.fill();
+        ctx.fillStyle = "#fff0a8"; ctx.fillRect(1.5, -1.5, 1, 3);
+      }
+      ctx.restore();
+    });
   }
 
   function updateParticles(dt) {

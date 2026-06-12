@@ -86,6 +86,20 @@ Current weapon families:
 - **Burnout Projector:** short-range expanding flame spread.
 - **Recursive Proof:** projectiles ricochet from obstacles.
 
+### Weapon visual language
+
+The visual redesign studies general principles found in mainstream loot shooters and action games: strong silhouette families, repeated manufacturer-style motifs, moving energy components, rarity-driven presentation, recoil, muzzle flash, projectile identity, and impact feedback. It does not copy a specific commercial weapon or asset.
+
+The original weapon houses are:
+
+- **Axiom:** practical angular receivers and clear mechanical parts.
+- **Vector:** compact high-rate weapons with fins and sharp forward lines.
+- **Forge:** heavy industrial bodies, large barrels, and warm metal accents.
+- **Helix:** advanced energy rails, coils, and bright internal cores.
+- **Relic:** floating or geometric technology with orbiting components.
+
+Every shot can now produce recoil, barrel heat, muzzle flash, expanding shock rings, ejected casings, sparks, and model-specific projectiles. Higher qualities add brighter cores, energy rails, pulsing auras, and orbiting particles. Weapon drops appear inside animated holographic rings and quality-colored light columns.
+
 Weapon quality chances improve on later floors, after boss fights, and through the Better Evidence talent.
 
 ### Character design
